@@ -1,0 +1,4 @@
+
+# local MCP config (may contain API keys)
+.mcp.json
+.vscode/mcp.json
