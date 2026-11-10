@@ -4,7 +4,7 @@ Find parties near you and get on the guest list.
 
 Partly is an installable web app for hosting and joining small local hangouts: house parties, rooftop jams, workshops, study sessions, chai breaks. Hosts keep their address private until they confirm a guest. Rooms never overfill. Guests get in by showing a QR pass at the door.
 
-> **Status: early development.** Phases 1 to 4 of 6 are complete: accounts, the installable app shell, offline support, event drafts, the filterable feed, the listing-fee checkout, and RSVPs with approvals, a waitlist and invitations, all covered by tests. The checkout runs in a sandbox; the Razorpay adapter is written but has not been run against live Razorpay yet. QR check-in and the background email pipeline are designed but not built; emails are plain text and sent directly for now. See [Roadmap](#roadmap).
+> **Status: early development.** Phases 1 to 5 of 6 are complete: accounts, the installable app shell, offline support, event drafts, the filterable feed, the listing-fee checkout, RSVPs with approvals, a waitlist and invitations, and QR passes with a door check-in scanner, all covered by tests. The checkout runs in a sandbox; the Razorpay adapter is written but has not been run against live Razorpay yet. The camera scanner has not yet been tried on a real phone, and offline pass display has not been checked in a browser. The background email pipeline is designed but not built; emails are sent directly for now. See [Roadmap](#roadmap).
 
 ## Why
 
@@ -26,7 +26,7 @@ Partly is built around a few rules:
 | Hosting | Draft and edit events, My Hosting dashboard | ✅ Built |
 | Publishing | Publish an event after paying a listing fee: sandbox UPI checkout, signed webhooks, Razorpay adapter | ✅ Built (sandbox) |
 | RSVPs | Capacity limits, optional host approval, waitlist, email invitations, My Tickets, guest manager for hosts | ✅ Built |
-| Check-in | QR pass for each guest; the host scans it with their phone camera | Phase 5 |
+| Check-in | Signed QR pass for each guest; the host scans it with a phone camera, with a manual fallback and live counts | ✅ Built (camera untested on device) |
 | Email | Confirmations, host alerts, reminders 24 h and 2 h before start | Phase 6 |
 
 ## Tech stack
@@ -113,7 +113,7 @@ apps/
   accounts/        custom User model, auth, profiles
   events/          events, feed, filters, hosting dashboard, seed_demo command
   payments/        listing-fee checkout, providers (mock, Razorpay) and the webhook
-  rsvps/           RSVPs, waitlist, invitations, My Tickets, guest manager (QR passes and check-in in Phase 5)
+  rsvps/           RSVPs, waitlist, invitations, My Tickets, guest manager (QR passes, door scanner, check-in)
   notifications/   Celery tasks and email (Phase 6)
 templates/         Django templates; the service worker is rendered from here
 static/            CSS design tokens, JavaScript, icons, vendored Bootstrap
@@ -140,7 +140,7 @@ Each phase is finished only when its tests pass and it has been checked by hand.
 2. ✅ **Events and feed:** drafts, filters, fast area search, demo data
 3. ✅ **Listing-fee checkout:** sandbox UPI, signed webhooks, Razorpay adapter (not yet tested against live Razorpay)
 4. ✅ **RSVP engine:** capacity, approvals, waitlist, invitations, overbooking tests under concurrent requests
-5. **QR passes and scanner:** signed passes, host camera check-in, offline tickets
+5. ✅ **QR passes and scanner:** signed passes, host camera check-in, offline tickets (camera and offline caching not yet checked on a device)
 6. **Email and reminders:** Celery pipeline, scheduled reminders, trust score
 
 ## Contributing

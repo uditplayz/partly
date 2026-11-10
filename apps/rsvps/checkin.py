@@ -19,12 +19,17 @@ def stats(event):
     party = F("plus_ones") + 1
     inside = Q(checked_in=True)
     row = RSVP.objects.filter(event=event, status=RSVP.Status.CONFIRMED).aggregate(
-        confirmed=Count("id"),
-        checked_in=Count("id", filter=inside),
-        people_confirmed=Sum(party),
-        people_checked_in=Sum(party, filter=inside),
+        n_confirmed=Count("id"),
+        n_in=Count("id", filter=inside),
+        p_confirmed=Sum(party),
+        p_in=Sum(party, filter=inside),
     )
-    return {key: value or 0 for key, value in row.items()}
+    return {
+        "confirmed": row["n_confirmed"] or 0,
+        "checked_in": row["n_in"] or 0,
+        "people_confirmed": row["p_confirmed"] or 0,
+        "people_checked_in": row["p_in"] or 0,
+    }
 
 
 def _clock(dt):
