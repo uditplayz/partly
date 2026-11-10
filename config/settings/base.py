@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.core.middleware.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -125,6 +126,11 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# --- Content-Security-Policy ------------------------------------------------
+CSP_ENABLED = env.bool("CSP_ENABLED", default=True)
+# Report-only logs violations in the browser console without blocking anything.
+CSP_REPORT_ONLY = env.bool("CSP_REPORT_ONLY", default=False)
 
 # --- App --------------------------------------------------------------------
 SITE_NAME = "Partly"

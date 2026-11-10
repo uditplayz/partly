@@ -7,7 +7,7 @@
   <meta name="description" content="{% block meta_description %}Find house parties, jams, workshops and chai breaks near you.{% endblock %}">
 
   {# Apply the saved theme before first paint to avoid a flash. #}
-  <script>
+  <script nonce="{{ csp_nonce }}">
     (function () {
       var pref = "auto";
       try { pref = localStorage.getItem("partly-theme") || "auto"; } catch (e) {}

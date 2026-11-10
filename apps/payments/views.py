@@ -47,6 +47,7 @@ def checkout(request, order_id):
     if not payment.is_open:
         return redirect("payments:return", order_id=order_id)
     provider = get_provider(payment.provider)
+    request.csp_razorpay = provider.name == "razorpay"
     context = {"payment": payment, "event": payment.event, **provider.checkout_context(payment, request)}
     return render(request, provider.checkout_template, context)
 

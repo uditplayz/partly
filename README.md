@@ -111,6 +111,8 @@ celery -A config beat -l info
 pytest
 ```
 
+GitHub Actions (`.github/workflows/ci.yml`) runs the same suite on Linux against PostgreSQL, plus a migrations check and Django's deploy checks on the production settings.
+
 Tests run against a real PostgreSQL database. The test runner creates and removes `test_partly` itself, so the database user needs permission to create databases.
 
 ### Testing on a phone
@@ -143,6 +145,7 @@ The rules that keep Partly safe live in the database and in a few narrow code pa
 - **Reminders can't double-send.** Each reminder is claimed with an atomic update before sending. If sending fails, the claim is released and the next run retries.
 - **Old passes stop working.** Each RSVP's pass token changes whenever it is cancelled, declined or re-requested.
 - **An invite works only for the person invited.** It skips host approval but never capacity, and the link is tied to the invited email or account, so forwarding it doesn't let someone else in.
+- **A strict Content-Security-Policy.** Pages allow scripts only from this site plus one nonce-tagged inline script (the theme setter), and no inline styles. Only the Razorpay checkout page gets a wider policy. Set `CSP_REPORT_ONLY=True` to log violations instead of blocking them, or `CSP_ENABLED=False` to turn it off. The camera is allowed for this site's own pages only (`Permissions-Policy`).
 - **Reminders can't be lost or doubled.** The scheduler claims each reminder with a conditional database update before queueing it, so two scheduler processes can't both send. If sending fails for good, the claim is released and the next run retries. A bug that fails every time would therefore retry every 15 minutes until fixed.
 - **Trust score is a plain formula.** `50 + 30 × attendance rate + 2 per hosted event (max 10) − 5 per event the host cancelled after publishing (max 4)`, clamped to 0 to 100. Attendance counts only confirmed guests on completed events. Accounts with fewer than 3 past events show as "New".
 - **Logging out clears saved passes.** Tickets are cached for offline use at the venue. Logout clears that cache so the next person on a shared phone can't see them.

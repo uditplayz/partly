@@ -32,6 +32,11 @@
     if (close) close.closest(".flash").remove();
   });
 
+  // <button data-reload> reloads the page (used by the offline page).
+  document.addEventListener("click", function (e) {
+    if (e.target.closest("[data-reload]")) location.reload();
+  });
+
   // A checkbox with data-hides="#selector" hides that element while it is checked.
   function syncHides(box) {
     var target = document.querySelector(box.dataset.hides);

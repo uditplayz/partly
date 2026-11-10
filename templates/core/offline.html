@@ -7,7 +7,7 @@
     <p class="text-secondary">No signal right now. Pages you've opened before, including your tickets, still work.</p>
     <div class="d-flex gap-2 justify-content-center flex-wrap">
       <a class="btn btn-primary rounded-pill px-4" href="{% url 'rsvps:tickets' %}">Open My Tickets</a>
-      <button type="button" class="btn btn-outline-primary rounded-pill px-4" onclick="location.reload()">Try again</button>
+      <button type="button" class="btn btn-outline-primary rounded-pill px-4" data-reload>Try again</button>
     </div>
   </div>
 {% endblock %}

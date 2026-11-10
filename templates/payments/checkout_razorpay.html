@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Pay listing fee · {{ SITE_NAME }}{% endblock %}
 {% block content %}
   <a class="back-link" href="{{ event.get_absolute_url }}">‹ Back to draft</a>
@@ -12,20 +13,9 @@
   </section>
 
   {{ razorpay_options|json_script:"rzp-options" }}
+  {{ return_url|json_script:"rzp-return" }}
 {% endblock %}
 {% block extra_js %}
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    (function () {
-      var options = JSON.parse(document.getElementById("rzp-options").textContent);
-      var returnUrl = "{{ return_url|escapejs }}";
-      // The return page only shows status. Publishing happens when Razorpay's webhook arrives.
-      options.handler = function () { window.location.href = returnUrl; };
-      document.getElementById("rzp-pay").addEventListener("click", function () {
-        var checkout = new Razorpay(options);
-        checkout.on("payment.failed", function () { window.location.href = returnUrl; });
-        checkout.open();
-      });
-    })();
-  </script>
+  <script src="{% static 'js/razorpay-checkout.js' %}"></script>
 {% endblock %}
