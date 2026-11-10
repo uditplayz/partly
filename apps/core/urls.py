@@ -6,6 +6,7 @@ app_name = "core"
 
 urlpatterns = [
     path("offline/", views.offline, name="offline"),
+    path("healthz/", views.healthz, name="healthz"),
     path("manifest.json", views.manifest, name="manifest"),
     path("serviceworker.js", views.serviceworker, name="serviceworker"),
 ]

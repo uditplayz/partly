@@ -48,3 +48,10 @@ jobs:
           RAZORPAY_WEBHOOK_SECRET: ci
       - name: Tests
         run: pytest
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The production image builds (wheels only, hashes checked, collectstatic runs)
+        run: docker build -t partly:ci .

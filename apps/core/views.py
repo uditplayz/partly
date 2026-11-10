@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, never_cache
 from django.views.decorators.http import require_GET
 
 # Static files the service worker precaches into the shell cache.
@@ -77,3 +77,17 @@ def serviceworker(request):
     )
     response["Service-Worker-Allowed"] = "/"
     return response
+
+
+@never_cache
+@require_GET
+def healthz(request):
+    """Liveness + database check for the container orchestrator. Reveals nothing else."""
+    from django.db import connection
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+    except Exception:  # noqa: BLE001
+        return JsonResponse({"ok": False}, status=503)
+    return JsonResponse({"ok": True})

@@ -53,3 +53,17 @@ def test_offline_page(client):
     resp = client.get(reverse("core:offline"))
     assert resp.status_code == 200
     assert "You&#x27;re offline" in resp.content.decode() or "You're offline" in resp.content.decode()
+
+
+def test_healthz_reports_ok_and_503_when_the_database_is_down(client, monkeypatch):
+    resp = client.get("/healthz/")
+    assert resp.status_code == 200 and resp.json() == {"ok": True}
+    assert "no-store" in resp["Cache-Control"]
+
+    from django.db import connection
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("db down")
+
+    monkeypatch.setattr(connection, "cursor", boom)
+    assert client.get("/healthz/").status_code == 503

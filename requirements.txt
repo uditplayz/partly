@@ -6,3 +6,4 @@ celery[redis]>=5.7,<5.8
 redis>=8.1,<9
 django-celery-beat>=2.9,<3
 segno>=1.6,<2
+gunicorn>=27,<28

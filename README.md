@@ -105,6 +105,20 @@ celery -A config beat -l info
 
 `migrate` installs four periodic jobs (reminders and event completion every 15 minutes, payment-order expiry every 10, trust scores nightly at 03:30 IST). They live in the database, so you can pause or retime them in the Django admin.
 
+### Deploying with Docker
+
+`docker-compose.yml` runs the web server (gunicorn), a Celery worker, Celery beat, PostgreSQL 17 and Redis 7. A one-shot `migrate` service runs first.
+
+```bash
+cp .env.production.example .env.production   # fill it in; it is gitignored
+export POSTGRES_PASSWORD=choose-a-strong-one
+docker compose up -d --build
+```
+
+The image installs from `requirements.lock` (exact versions with hashes, wheels only), runs as a non-root user and serves hashed static files through WhiteNoise. `/healthz/` checks the database. TLS is not included: put a reverse proxy in front of port 8000 that sends `X-Forwarded-Proto: https`, and keep `SECURE_SSL_REDIRECT` on. Set `SECURE_SSL_REDIRECT=False` only to try the stack over plain HTTP on your own machine. Regenerate both lock files with `pip-compile` after changing `requirements*.txt`.
+
+Checked on this project: the stack builds and comes up with Docker on Windows, `/healthz/` and the feed return 200, hashed static files are served, the security headers are present, and the worker connects to Redis. Not checked: a real server with a domain and TLS, real SMTP, Razorpay live, backups of the `pgdata` volume (set those up yourself).
+
 ### Running tests
 
 ```bash

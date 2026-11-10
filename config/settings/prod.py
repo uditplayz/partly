@@ -37,3 +37,6 @@ EMAIL_TIMEOUT = 15  # a hung SMTP server must not pin a worker forever
 CELERY_BROKER_URL = env("REDIS_URL")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_TASK_ALWAYS_EAGER = False
+
+# The container health check talks plain HTTP from inside the container.
+SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
