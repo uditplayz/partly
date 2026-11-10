@@ -1,0 +1,31 @@
+<form class="filter-bar" method="get" action="{% url 'events:feed' %}" data-feed-filters role="search" aria-label="Filter events">
+  <div class="filter-bar__row">
+    <label class="filter-search">
+      <span class="visually-hidden">Area or landmark</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <input type="search" name="area" value="{{ filters.cleaned_data.area|default:'' }}" placeholder="Area, campus, landmark" maxlength="60" autocomplete="off" enterkeyhint="search">
+    </label>
+  </div>
+
+  <div class="filter-bar__row" role="radiogroup" aria-label="When">
+    <div class="segmented segmented--wide">
+      {% with current=filters.cleaned_data.when|default:'upcoming' %}
+        <label><input type="radio" name="when" value="upcoming" {% if current == 'upcoming' %}checked{% endif %}><span>Upcoming</span></label>
+        <label><input type="radio" name="when" value="tonight" {% if current == 'tonight' %}checked{% endif %}><span>Tonight</span></label>
+        <label><input type="radio" name="when" value="weekend" {% if current == 'weekend' %}checked{% endif %}><span>This weekend</span></label>
+      {% endwith %}
+    </div>
+  </div>
+
+  <div class="pill-row chip-select" aria-label="Vibes and entry">
+    {% for value, label in filters.fields.vibe.choices %}
+      <label class="chip-select__chip">
+        <input type="checkbox" name="vibe" value="{{ value }}" {% if value in filters.cleaned_data.vibe %}checked{% endif %}><span>{{ label }}</span>
+      </label>
+    {% endfor %}
+    <label class="chip-select__chip"><input type="checkbox" name="free" value="1" {% if filters.cleaned_data.free %}checked{% endif %}><span>Free only</span></label>
+    <label class="chip-select__chip"><input type="checkbox" name="open" value="1" {% if filters.cleaned_data.open %}checked{% endif %}><span>Spots open</span></label>
+  </div>
+
+  <noscript><button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 mb-3">Apply filters</button></noscript>
+</form>

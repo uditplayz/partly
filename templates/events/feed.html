@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Explore · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <p class="eyebrow">{% if user.is_authenticated %}Hey {{ user.name }}{% else %}Tonight and beyond{% endif %}</p>
+    <h1 class="display-title">What's happening<br>around you</h1>
+  </section>
+
+  {% include "partials/filter_bar.html" %}
+
+  <div id="feed-results" aria-live="polite" aria-busy="false">
+    {% include "partials/event_card_list.html" %}
+  </div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/feed.js' %}" defer></script>{% endblock %}

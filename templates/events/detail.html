@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load event_tags %}
+{% block title %}{{ event.title }} · {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ event.get_vibe_category_display }} in {{ event.area_name }}. {{ event.description|truncatechars:140 }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{% if is_host %}{% url 'events:my_hosting' %}{% else %}{% url 'events:feed' %}{% endif %}">‹ {% if is_host %}My hosting{% else %}Explore{% endif %}</a>
+
+  <article class="p-card event-detail">
+    <div class="event-card__top">
+      <span class="vibe-pill vibe-pill--{{ event.vibe_category }}">{{ event.get_vibe_category_display }}</span>
+      <span class="entry-badge{% if event.is_free_entry %} entry-badge--free{% endif %}">{{ event.entry_label }}</span>
+    </div>
+
+    <h1 class="display-title display-title--sm mt-2">{{ event.title }}</h1>
+
+    {% if is_host and event.status != 'PUBLISHED' %}
+      <p class="status-chip status-chip--{{ event.status|lower }}">{{ event.get_status_display }}</p>
+    {% endif %}
+
+    <dl class="fact-list">
+      <div><dt>When</dt><dd>{% when_label event %}<span class="text-secondary"> · until {{ event.end_time|clock }}</span></dd></div>
+      <div><dt>Where</dt><dd>{{ event.area_name }}</dd></div>
+      <div><dt>Spots</dt><dd>{{ event.capacity }} people{% if event.max_plus_ones %} · up to {{ event.max_plus_ones }} plus-one{{ event.max_plus_ones|pluralize }} each{% endif %}</dd></div>
+      <div><dt>Entry</dt><dd>{{ event.entry_label }}{% if event.entry_fee_notes %}<span class="text-secondary"> · {{ event.entry_fee_notes }}</span>{% endif %}</dd></div>
+    </dl>
+
+    {% if address %}
+      <div class="address-box address-box--open">
+        <p class="address-box__label">Exact address</p>
+        <p class="address-box__value">{{ address|linebreaksbr }}</p>
+        <p class="address-box__hint">Only you and confirmed guests can see this.</p>
+      </div>
+    {% else %}
+      <div class="address-box">
+        <p class="address-box__label">Exact address</p>
+        <p class="address-box__hint mb-0">Unlocks once {% if event.requires_host_approval %}the host approves you{% else %}you're confirmed{% endif %}.</p>
+      </div>
+    {% endif %}
+
+    {% if event.description %}
+      <div class="event-detail__body">{{ event.description|linebreaks }}</div>
+    {% endif %}
+
+    <a class="host-row" href="{% url 'public_profile' event.host.username %}">
+      <span class="avatar" aria-hidden="true">{{ event.host.initials }}</span>
+      <span><span class="host-row__label">Hosted by</span><br><strong>{{ event.host.name }}</strong></span>
+      {% if event.host.is_new_member %}<span class="trust-chip trust-chip--new ms-auto">New host</span>{% else %}<span class="trust-chip ms-auto">Trust {{ event.host.trust_score }}</span>{% endif %}
+    </a>
+  </article>
+
+  {% if is_host %}
+    <section class="p-card host-actions">
+      {% if event.status == 'DRAFT' %}
+        <p class="mb-3">This is a draft, so only you can see it. Publishing with the ₹{{ PLATFORM_FEE }} listing fee arrives in the next update.</p>
+      {% endif %}
+      <div class="d-flex gap-2 flex-wrap">
+        {% if event.is_editable %}<a class="btn btn-primary rounded-pill px-4" href="{% url 'events:edit' event.slug %}">Edit</a>{% endif %}
+        {% if event.status == 'DRAFT' %}
+          <form method="post" action="{% url 'events:delete' event.slug %}" data-confirm="Delete this draft?">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary rounded-pill px-4">Delete draft</button>
+          </form>
+        {% endif %}
+      </div>
+    </section>
+  {% else %}
+    <div class="sticky-cta">
+      <button type="button" class="btn btn-accent rounded-pill w-100 py-2" disabled>RSVPs open soon</button>
+    </div>
+  {% endif %}
+{% endblock %}

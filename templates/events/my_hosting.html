@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load event_tags %}
+{% block title %}My hosting · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head d-flex align-items-end justify-content-between gap-3">
+    <div>
+      <p class="eyebrow">Your hangouts</p>
+      <h1 class="display-title display-title--sm mb-0">My hosting</h1>
+    </div>
+    <a class="btn btn-accent rounded-pill px-3" href="{% url 'events:create' %}">+ New</a>
+  </section>
+
+  {% if not drafts and not live and not past %}
+    <div class="p-card empty-state">
+      <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h2 class="h5">Nothing hosted yet</h2>
+      <p class="text-secondary mb-3">A study sesh for four counts. Start small.</p>
+      <a class="btn btn-primary rounded-pill px-4" href="{% url 'events:create' %}">Host a hangout</a>
+    </div>
+  {% endif %}
+
+  {% if live %}
+    <h2 class="section-title">Live</h2>
+    <div class="host-list">{% for event in live %}{% include "events/_host_row.html" %}{% endfor %}</div>
+  {% endif %}
+  {% if drafts %}
+    <h2 class="section-title">Drafts</h2>
+    <div class="host-list">{% for event in drafts %}{% include "events/_host_row.html" %}{% endfor %}</div>
+  {% endif %}
+  {% if past %}
+    <h2 class="section-title">Past &amp; cancelled</h2>
+    <div class="host-list host-list--quiet">{% for event in past %}{% include "events/_host_row.html" %}{% endfor %}</div>
+  {% endif %}
+{% endblock %}

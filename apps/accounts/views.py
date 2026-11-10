@@ -16,11 +16,11 @@ from .models import User
 class SignupView(CreateView):
     form_class = SignupForm
     template_name = "accounts/signup.html"
-    success_url = reverse_lazy("core:home")
+    success_url = reverse_lazy("events:feed")
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect("core:home")
+            return redirect("events:feed")
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -47,7 +47,7 @@ class LogoutView(auth_views.LogoutView):
     def post(self, request, *args, **kwargs):
         # Validated ?next= (falls back to home). We always render the interstitial
         # rather than redirecting, so the SW cache wipe can never be skipped.
-        next_url = self.get_redirect_url() or reverse("core:home")
+        next_url = self.get_redirect_url() or reverse("events:feed")
         auth_logout(request)
         return self.render_to_response(self.get_context_data(next_url=next_url))
 

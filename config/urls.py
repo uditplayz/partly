@@ -9,6 +9,7 @@ urlpatterns = [
     path("accounts/", include("apps.accounts.urls")),
     path("u/<str:username>/", PublicProfileView.as_view(), name="public_profile"),
     path("", include("apps.core.urls")),
+    path("", include("apps.events.urls")),
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:

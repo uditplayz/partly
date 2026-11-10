@@ -1,0 +1,19 @@
+{% load event_tags %}
+<a class="event-card" href="{{ event.get_absolute_url }}">
+  <div class="event-card__top">
+    <span class="vibe-pill vibe-pill--{{ event.vibe_category }}">{{ event.get_vibe_category_display }}</span>
+    <span class="entry-badge{% if event.is_free_entry %} entry-badge--free{% endif %}">{{ event.entry_label }}</span>
+  </div>
+  <h2 class="event-card__title">{{ event.title }}</h2>
+  <p class="event-card__meta">
+    <span class="event-card__when">{% when_label event now %}</span>
+    <span aria-hidden="true">·</span>
+    <span>{{ event.area_name }}</span>
+  </p>
+  <div class="event-card__foot">
+    {% spots_label event as spots %}
+    <span class="spot-counter{% if spots == 'Full' %} spot-counter--full{% endif %}">{{ spots }}</span>
+    {% if event.requires_host_approval %}<span class="tag-quiet">Host approves</span>{% endif %}
+    <span class="event-card__host">by {{ event.host.name }}</span>
+  </div>
+</a>

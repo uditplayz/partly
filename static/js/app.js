@@ -32,8 +32,24 @@
     if (close) close.closest(".flash").remove();
   });
 
+  // A checkbox with data-hides="#selector" hides that element while it is checked.
+  function syncHides(box) {
+    var target = document.querySelector(box.dataset.hides);
+    if (target) target.hidden = box.checked;
+  }
+  document.addEventListener("change", function (e) {
+    if (e.target.matches("[data-hides]")) syncHides(e.target);
+  });
+
+  // <form data-confirm="Question?"> asks before submitting.
+  document.addEventListener("submit", function (e) {
+    var msg = e.target.dataset && e.target.dataset.confirm;
+    if (msg && !window.confirm(msg)) e.preventDefault();
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     applyTheme(readPref());
+    document.querySelectorAll("[data-hides]").forEach(syncHides);
     // Calm, auto-fading flash messages.
     setTimeout(function () {
       document.querySelectorAll(".flash").forEach(function (el) { el.classList.add("flash--fade"); });

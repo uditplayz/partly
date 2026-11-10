@@ -23,7 +23,7 @@ def signup_data(**overrides):
 
 def test_signup_creates_user_and_logs_in(client):
     resp = client.post(reverse("accounts:signup"), signup_data())
-    assert resp.status_code == 302 and resp.url == reverse("core:home")
+    assert resp.status_code == 302 and resp.url == reverse("events:feed")
     user = User.objects.get(username="aditi")
     assert user.display_name == "Aditi"
     assert int(client.session["_auth_user_id"]) == user.pk

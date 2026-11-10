@@ -1,0 +1,11 @@
+{% load event_tags %}
+<a class="host-row-item" href="{{ event.get_absolute_url }}">
+  <span class="vibe-dot vibe-pill--{{ event.vibe_category }}" aria-hidden="true"></span>
+  <span class="host-row-item__main">
+    <strong>{{ event.title }}</strong>
+    <span class="text-secondary">{% when_label event %} · {{ event.area_name }}</span>
+  </span>
+  <span class="host-row-item__side">
+    {% if event.status == 'PUBLISHED' %}{% spots_label event %}{% else %}<span class="status-chip status-chip--{{ event.status|lower }}">{{ event.get_status_display }}</span>{% endif %}
+  </span>
+</a>

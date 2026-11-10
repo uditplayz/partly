@@ -18,6 +18,7 @@ SHELL_ASSETS = [
     "css/app.css",
     "js/app.js",
     "js/sw-register.js",
+    "js/feed.js",
     "js/logout.js",
     "icons/icon.svg",
     "icons/icon-192.png",
@@ -28,20 +29,11 @@ SHELL_ASSETS = [
 SW_NEVER_CACHE = ["/api/", "/payments/", "/accounts/", "/admin/", "/__debug__/"]
 
 COMING_SOON = {
-    "host": {
-        "title": "Host something",
-        "body": "Spin up a house party, a jam or a chai break. Event creation lands in the next build.",
-    },
     "tickets": {
         "title": "My Tickets",
         "body": "Your RSVPs and QR passes will live here.",
     },
 }
-
-
-@require_GET
-def home(request):
-    return render(request, "core/home.html")
 
 
 @require_GET
@@ -77,7 +69,7 @@ def manifest(request):
         ],
         "shortcuts": [
             {"name": "My Tickets", "url": reverse("core:tickets")},
-            {"name": "Host an event", "url": reverse("core:host")},
+            {"name": "Host an event", "url": reverse("events:create")},
         ],
     }
     return JsonResponse(data, content_type="application/manifest+json")

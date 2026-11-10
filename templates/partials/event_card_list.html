@@ -1,0 +1,22 @@
+{% if events %}
+  <div class="event-list">
+    {% for event in events %}{% include "partials/event_card.html" %}{% endfor %}
+  </div>
+  {% if next_cursor %}
+    <a class="btn btn-outline-primary rounded-pill w-100 load-more" data-load-more
+       href="{% url 'events:feed' %}?{% if query_string %}{{ query_string }}&amp;{% endif %}cursor={{ next_cursor|urlencode }}">Load more</a>
+  {% endif %}
+{% elif is_first_page %}
+  <div class="p-card empty-state">
+    <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+    {% if filters.is_filtered %}
+      <h2 class="h5">Nothing matches that yet</h2>
+      <p class="text-secondary mb-3">Try another vibe or a wider date range.</p>
+      <a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'events:feed' %}" data-clear-filters>Clear filters</a>
+    {% else %}
+      <h2 class="h5">The feed is warming up</h2>
+      <p class="text-secondary mb-3">No hangouts listed yet. Want to be the first?</p>
+      <a class="btn btn-primary rounded-pill px-4" href="{% url 'events:create' %}">Host a hangout</a>
+    {% endif %}
+  </div>
+{% endif %}

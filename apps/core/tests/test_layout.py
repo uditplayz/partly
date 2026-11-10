@@ -13,7 +13,7 @@ def read_static(path):
 
 
 def test_home_renders_shell(client):
-    resp = client.get(reverse("core:home"))
+    resp = client.get(reverse("events:feed"))
     html = resp.content.decode()
     assert resp.status_code == 200
     assert 'rel="manifest"' in html
@@ -24,7 +24,7 @@ def test_home_renders_shell(client):
 
 
 def test_fonts_are_bricolage_and_atkinson(client):
-    html = client.get(reverse("core:home")).content.decode()
+    html = client.get(reverse("events:feed")).content.decode()
     assert "Bricolage+Grotesque" in html and "Atkinson+Hyperlegible" in html
 
 
@@ -47,7 +47,7 @@ def test_bottom_nav_marks_active_tab(auth_client):
     assert 'bottom-nav__item is-active" href="/tickets/"' in html
 
 
-@pytest.mark.parametrize("name", ["core:host", "core:tickets"])
+@pytest.mark.parametrize("name", ["core:tickets", "events:create", "events:my_hosting"])
 def test_placeholder_sections_require_login(client, name):
     resp = client.get(reverse(name))
     assert resp.status_code == 302 and "/accounts/login/" in resp.url

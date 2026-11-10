@@ -1,10 +1,10 @@
 {% load ui %}
 <nav class="bottom-nav d-md-none" aria-label="Primary">
-  <a class="bottom-nav__item {% nav_active 'core:home' %}" href="{% url 'core:home' %}">
+  <a class="bottom-nav__item {% nav_active 'events:feed' %}" href="{% url 'events:feed' %}">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
     <span>Explore</span>
   </a>
-  <a class="bottom-nav__item bottom-nav__item--host {% nav_active 'core:host' %}" href="{% url 'core:host' %}">
+  <a class="bottom-nav__item bottom-nav__item--host {% nav_active 'events:create' %} {% nav_active 'events:my_hosting' %}" href="{% url 'events:create' %}">
     <span class="bottom-nav__plus" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
     <span>Host +</span>
   </a>

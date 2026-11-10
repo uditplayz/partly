@@ -8,6 +8,11 @@
         </label>
       {% endfor %}
     </div>
+  {% elif field.widget_type == 'checkbox' %}
+    <label class="toggle-row" for="{{ field.id_for_label }}">
+      <span>{{ field.label }}</span>
+      <input type="checkbox" name="{{ field.html_name }}" id="{{ field.id_for_label }}" class="toggle"{% if field.value %} checked{% endif %}{% if toggle_target %} data-hides="{{ toggle_target }}"{% endif %}>
+    </label>
   {% else %}
     <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
     {{ field }}

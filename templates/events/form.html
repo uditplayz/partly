@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit event{% else %}Host a hangout{% endif %} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <p class="eyebrow">{% if object %}Editing{% else %}New hangout{% endif %}</p>
+    <h1 class="display-title display-title--sm">{% if object %}{{ object.title }}{% else %}What are you hosting?{% endif %}</h1>
+  </section>
+
+  <form method="post" novalidate class="event-form">
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}<div class="notice">{{ error }}</div>{% endfor %}
+
+    <fieldset class="p-card">
+      <legend>The basics</legend>
+      {% include "partials/form_field.html" with field=form.title %}
+      {% include "partials/form_field.html" with field=form.vibe_category %}
+      {% include "partials/form_field.html" with field=form.description %}
+    </fieldset>
+
+    <fieldset class="p-card">
+      <legend>Where</legend>
+      {% include "partials/form_field.html" with field=form.area_name %}
+      {% include "partials/form_field.html" with field=form.exact_address %}
+      <p class="form-text mt-n2">The feed only shows the area. The exact address unlocks for guests you confirm.</p>
+    </fieldset>
+
+    <fieldset class="p-card">
+      <legend>When</legend>
+      <div class="field-grid">
+        {% include "partials/form_field.html" with field=form.start_time %}
+        {% include "partials/form_field.html" with field=form.end_time %}
+      </div>
+      {% include "partials/form_field.html" with field=form.rsvp_deadline %}
+    </fieldset>
+
+    <fieldset class="p-card">
+      <legend>Who</legend>
+      <div class="field-grid">
+        {% include "partials/form_field.html" with field=form.capacity %}
+        {% include "partials/form_field.html" with field=form.max_plus_ones %}
+      </div>
+      {% include "partials/form_field.html" with field=form.requires_host_approval %}
+    </fieldset>
+
+    <fieldset class="p-card">
+      <legend>Entry</legend>
+      {% include "partials/form_field.html" with field=form.is_free_entry toggle_target="#paid-fields" %}
+      <div id="paid-fields">
+        {% include "partials/form_field.html" with field=form.venue_entry_fee_inr %}
+      </div>
+      {% include "partials/form_field.html" with field=form.entry_fee_notes %}
+      <p class="form-text mb-0">Guests pay you at the venue. Partly never handles that money.</p>
+    </fieldset>
+
+    <div class="d-flex gap-2 mb-4">
+      <button class="btn btn-primary rounded-pill px-4" type="submit">{% if object %}Save changes{% else %}Save draft{% endif %}</button>
+      <a class="btn btn-outline-primary rounded-pill px-4" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'events:my_hosting' %}{% endif %}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

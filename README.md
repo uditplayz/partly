@@ -4,7 +4,7 @@ Find parties near you and get on the guest list.
 
 Partly is an installable web app for hosting and joining small local hangouts: house parties, rooftop jams, workshops, study sessions, chai breaks. Hosts keep their address private until they confirm a guest. Rooms never overfill. Guests get in by showing a QR pass at the door.
 
-> **Status: early development.** Phase 1 of 6 is complete: accounts, the installable app shell and offline support, all covered by tests. Events, RSVPs, payments and check-in are designed but not built yet. See [Roadmap](#roadmap).
+> **Status: early development.** Phases 1 and 2 of 6 are complete: accounts, the installable app shell, offline support, event drafts and the filterable feed, all covered by tests. Payments, RSVPs and check-in are designed but not built yet. See [Roadmap](#roadmap).
 
 ## Why
 
@@ -22,8 +22,9 @@ Partly is built around a few rules:
 | --- | --- | --- |
 | Accounts | Sign up, log in with username or email, profiles with vibe tags | ✅ Built |
 | App shell | Installable PWA, offline page, light and dark themes, mobile bottom nav | ✅ Built |
-| Feed | List of events filtered by vibe, area, date, free entry and open spots | Phase 2 |
-| Hosting | Publish an event after paying a listing fee via UPI (sandbox, Razorpay-ready) | Phase 3 |
+| Feed | List of events filtered by vibe, area, date, free entry and open spots | ✅ Built |
+| Hosting | Draft and edit events, My Hosting dashboard | ✅ Built |
+| Publishing | Publish an event after paying a listing fee via UPI (sandbox, Razorpay-ready) | Phase 3 |
 | RSVPs | Capacity limits, optional host approval, waitlist, email invitations | Phase 4 |
 | Check-in | QR pass for each guest; the host scans it with their phone camera | Phase 5 |
 | Email | Confirmations, host alerts, reminders 24 h and 2 h before start | Phase 6 |
@@ -62,6 +63,7 @@ createdb partly               # or: psql -c "CREATE DATABASE partly"
 
 python manage.py migrate
 python manage.py createsuperuser   # optional, for /admin/
+python manage.py seed_demo         # optional: 40 demo events (login demo_aditi / partly-demo-pass)
 python manage.py runserver
 ```
 
@@ -105,7 +107,7 @@ config/            settings (base, dev, test, prod), URLs, Celery app
 apps/
   core/            layout, PWA (manifest, service worker, offline page), shared constants
   accounts/        custom User model, auth, profiles
-  events/          events and feed (Phase 2)
+  events/          events, feed, filters, hosting dashboard, seed_demo command
   payments/        listing-fee checkout and webhook (Phase 3)
   rsvps/           RSVPs, invitations, QR passes, check-in (Phases 4–5)
   notifications/   Celery tasks and email (Phase 6)
@@ -130,7 +132,7 @@ The rules that keep Partly safe live in the database and in a few narrow code pa
 Each phase is finished only when its tests pass and it has been checked by hand.
 
 1. ✅ **Foundation and PWA shell:** accounts, design system, installable offline app
-2. **Events and feed:** drafts, filters, fast area search, demo data
+2. ✅ **Events and feed:** drafts, filters, fast area search, demo data
 3. **Listing-fee checkout:** sandbox UPI, signed webhooks, Razorpay adapter
 4. **RSVP engine:** capacity, approvals, waitlist, invitations, overbooking tests under concurrent requests
 5. **QR passes and scanner:** signed passes, host camera check-in, offline tickets
