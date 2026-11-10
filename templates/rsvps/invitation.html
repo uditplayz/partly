@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load event_tags %}
+{% block title %}You're invited · {{ event.title }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <p class="eyebrow">{{ invitation.invited_by.name }} invited you</p>
+    <h1 class="display-title display-title--sm">{{ event.title }}</h1>
+  </section>
+
+  <article class="p-card">
+    <div class="event-card__top">
+      <span class="vibe-pill vibe-pill--{{ event.vibe_category }}">{{ event.get_vibe_category_display }}</span>
+      <span class="entry-badge{% if event.is_free_entry %} entry-badge--free{% endif %}">{{ event.entry_label }}</span>
+    </div>
+    <dl class="fact-list">
+      <div><dt>When</dt><dd>{% when_label event %}<span class="text-secondary"> · until {{ event.end_time|clock }}</span></dd></div>
+      <div><dt>Where</dt><dd>{{ event.area_name }}<span class="text-secondary"> · exact address after you accept</span></dd></div>
+      <div><dt>Host</dt><dd>{{ event.host.name }}</dd></div>
+    </dl>
+
+    {% if not is_open %}
+      <p class="notice mb-0">This event is no longer taking RSVPs.</p>
+    {% elif invitation.status == 'ACCEPTED' %}
+      <p class="mb-3">You've accepted this invite.</p>
+      <a class="btn btn-primary rounded-pill px-4" href="{{ event.get_absolute_url }}">View event</a>
+    {% elif not user.is_authenticated %}
+      <a class="btn btn-accent rounded-pill w-100 py-2" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to respond</a>
+      <p class="form-text text-center mt-2 mb-0">No account yet? <a href="{% url 'accounts:signup' %}">Sign up</a> with {{ invitation.invitee_email|default:"the invited email" }}, then open this link again.</p>
+    {% elif problem %}
+      <p class="notice mb-0">{{ problem }}</p>
+    {% else %}
+      <form method="post" class="d-grid gap-2">
+        {% csrf_token %}
+        {% if event.max_plus_ones %}
+          <div class="field mb-1">
+            <label class="form-label" for="inv-plus-ones">Bringing anyone?</label>
+            <select id="inv-plus-ones" name="plus_ones">
+              {% for n in plus_one_range %}<option value="{{ n }}">{% if n == 0 %}Just me{% else %}Me + {{ n }}{% endif %}</option>{% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        <button type="submit" name="action" value="accept" class="btn btn-accent rounded-pill py-2">Accept invite</button>
+        {% if invitation.status == 'SENT' %}
+          <button type="submit" name="action" value="decline" class="btn btn-outline-primary rounded-pill py-2">Can't make it</button>
+        {% endif %}
+      </form>
+    {% endif %}
+  </article>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load event_tags %}
+{% block title %}My Tickets · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <p class="eyebrow">Your plans</p>
+    <h1 class="display-title display-title--sm">My Tickets</h1>
+  </section>
+
+  {% if not rsvps %}
+    <div class="p-card empty-state">
+      <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h2 class="h5">No plans yet</h2>
+      <p class="text-secondary mb-3">RSVP to something and it shows up here, address and all.</p>
+      <a class="btn btn-primary rounded-pill px-4" href="{% url 'events:feed' %}">Explore hangouts</a>
+    </div>
+  {% endif %}
+
+  <div class="event-list">
+    {% for rsvp in rsvps %}
+      <article class="p-card plan-card mb-0">
+        <div class="event-card__top">
+          <span class="vibe-pill vibe-pill--{{ rsvp.event.vibe_category }}">{{ rsvp.event.get_vibe_category_display }}</span>
+          <span class="status-chip status-chip--{{ rsvp.status|lower }}">
+            {% if rsvp.status == 'CONFIRMED' %}You're in{% if rsvp.plus_ones %} · +{{ rsvp.plus_ones }}{% endif %}{% elif rsvp.status == 'WAITLISTED' %}Waitlisted{% else %}Waiting for host{% endif %}
+          </span>
+        </div>
+        <h2 class="event-card__title"><a href="{{ rsvp.event.get_absolute_url }}">{{ rsvp.event.title }}</a></h2>
+        <p class="event-card__meta">
+          <span class="event-card__when">{% when_label rsvp.event now %}</span>
+          <span aria-hidden="true">·</span><span>{{ rsvp.event.area_name }}</span>
+          <span aria-hidden="true">·</span><span>{{ rsvp.event.entry_label }}</span>
+        </p>
+        {% if rsvp.address %}
+          <div class="address-box address-box--open mb-0">
+            <p class="address-box__label">Exact address</p>
+            <p class="address-box__value mb-0">{{ rsvp.address|linebreaksbr }}</p>
+          </div>
+        {% else %}
+          <p class="text-secondary mb-0">The address unlocks once you're confirmed.</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+{% endblock %}

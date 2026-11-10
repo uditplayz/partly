@@ -50,7 +50,8 @@ def test_seed_demo(settings):
     settings.DEBUG = True
     call_command("seed_demo")
     assert Event.objects.published().count() == 40
-    assert User.objects.filter(username__startswith="demo_").count() == 6
+    assert User.objects.filter(username__startswith="demo_").count() == 10  # 6 hosts + 4 guests
+    assert Event.objects.with_seats().filter(seats_used__gt=0).exists()
     assert len(set(Event.objects.values_list("vibe_category", flat=True))) == 7
 
     call_command("seed_demo")  # second run without --reset is a no-op

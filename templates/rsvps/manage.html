@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load event_tags %}
+{% block title %}Guests · {{ event.title }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ event.get_absolute_url }}">‹ {{ event.title }}</a>
+
+  <section class="page-head">
+    <p class="eyebrow">{% when_label event %} · {{ event.area_name }}</p>
+    <h1 class="display-title display-title--sm">Guest list</h1>
+  </section>
+
+  <div class="stat-row">
+    <div class="stat"><strong>{{ event.seats_used }}/{{ event.capacity }}</strong><span>spots taken</span></div>
+    <div class="stat"><strong>{{ pending|length }}</strong><span>waiting on you</span></div>
+    <div class="stat"><strong>{{ waitlisted|length }}</strong><span>on waitlist</span></div>
+    <div class="stat"><strong>{{ checked_in_count }}</strong><span>checked in</span></div>
+  </div>
+
+  {% if pending %}
+    <h2 class="section-title">Waiting for your call</h2>
+    <div class="host-list">
+      {% for rsvp in pending %}
+        <div class="guest-row">
+          <span class="avatar" aria-hidden="true">{{ rsvp.user.initials }}</span>
+          <div class="guest-row__main">
+            <a href="{% url 'public_profile' rsvp.user.username %}"><strong>{{ rsvp.user.name }}</strong></a>
+            <span class="text-secondary">{% if rsvp.plus_ones %}+{{ rsvp.plus_ones }} · {% endif %}{% if rsvp.user.is_new_member %}New to Partly{% else %}Trust {{ rsvp.user.trust_score }}{% endif %}{% if rsvp.user.campus_tag %} · {{ rsvp.user.campus_tag }}{% endif %}</span>
+            {% if rsvp.note_to_host %}<span class="guest-row__note">“{{ rsvp.note_to_host }}”</span>{% endif %}
+          </div>
+          <div class="guest-row__actions">
+            <form method="post" action="{% url 'rsvps:approve' rsvp.pk %}">{% csrf_token %}<button class="btn btn-primary btn-sm rounded-pill px-3" type="submit">Approve</button></form>
+            <form method="post" action="{% url 'rsvps:decline' rsvp.pk %}">{% csrf_token %}<button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="submit">Decline</button></form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2 class="section-title">Confirmed</h2>
+  {% if confirmed %}
+    <div class="host-list">
+      {% for rsvp in confirmed %}
+        <div class="guest-row">
+          <span class="avatar" aria-hidden="true">{{ rsvp.user.initials }}</span>
+          <div class="guest-row__main">
+            <a href="{% url 'public_profile' rsvp.user.username %}"><strong>{{ rsvp.user.name }}</strong></a>
+            <span class="text-secondary">{% if rsvp.plus_ones %}+{{ rsvp.plus_ones }} · {% endif %}{% if rsvp.checked_in %}Checked in{% elif rsvp.via_invitation_id %}Invited{% else %}Confirmed{% endif %}</span>
+          </div>
+          {% if not rsvp.checked_in %}
+            <div class="guest-row__actions">
+              <form method="post" action="{% url 'rsvps:decline' rsvp.pk %}" data-confirm="Remove {{ rsvp.user.name }} from the guest list?">{% csrf_token %}<button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="submit">Remove</button></form>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-secondary">Nobody confirmed yet.</p>
+  {% endif %}
+
+  {% if waitlisted %}
+    <h2 class="section-title">Waitlist, in order</h2>
+    <div class="host-list">
+      {% for rsvp in waitlisted %}
+        <div class="guest-row">
+          <span class="guest-row__pos">{{ forloop.counter }}</span>
+          <div class="guest-row__main">
+            <strong>{{ rsvp.user.name }}</strong>
+            <span class="text-secondary">{% if rsvp.plus_ones %}+{{ rsvp.plus_ones }} · {% endif %}moves up when a spot opens</span>
+          </div>
+          <div class="guest-row__actions">
+            <form method="post" action="{% url 'rsvps:decline' rsvp.pk %}">{% csrf_token %}<button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="submit">Remove</button></form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2 class="section-title">Invite friends</h2>
+  <section class="p-card">
+    {% if event.status == 'PUBLISHED' %}
+      <form method="post" action="{% url 'rsvps:invite' event.slug %}">
+        {% csrf_token %}
+        {% include "partials/form_field.html" with field=invite_form.emails %}
+        <button class="btn btn-primary rounded-pill px-4" type="submit">Send invites</button>
+        <p class="form-text mt-2 mb-0">Invited friends skip your approval, but still need a free spot.</p>
+      </form>
+    {% else %}
+      <p class="text-secondary mb-0">Invites are closed for this event.</p>
+    {% endif %}
+    {% if invitations %}
+      <ul class="invite-list">
+        {% for inv in invitations %}
+          <li><span>{{ inv.invitee_label }}</span><span class="status-chip status-chip--{{ inv.status|lower }}">{{ inv.get_status_display }}</span></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+{% endblock %}

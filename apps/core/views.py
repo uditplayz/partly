@@ -1,7 +1,6 @@
 import json
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
@@ -27,20 +26,6 @@ SHELL_ASSETS = [
 
 # Path prefixes the service worker must never cache (user-specific or side effects).
 SW_NEVER_CACHE = ["/api/", "/payments/", "/accounts/", "/admin/", "/__debug__/"]
-
-COMING_SOON = {
-    "tickets": {
-        "title": "My Tickets",
-        "body": "Your RSVPs and QR passes will live here.",
-    },
-}
-
-
-@require_GET
-@login_required
-def coming_soon(request, section):
-    return render(request, "core/coming_soon.html", COMING_SOON[section])
-
 
 @require_GET
 def offline(request):
@@ -68,7 +53,7 @@ def manifest(request):
             {"src": static("icons/icon-maskable-512.png"), "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
         ],
         "shortcuts": [
-            {"name": "My Tickets", "url": reverse("core:tickets")},
+            {"name": "My Tickets", "url": reverse("rsvps:tickets")},
             {"name": "Host an event", "url": reverse("events:create")},
         ],
     }

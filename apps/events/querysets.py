@@ -1,5 +1,7 @@
 from django.db import models
-from django.db.models import F, IntegerField, Value
+from django.apps import apps
+from django.db.models import F, IntegerField, OuterRef, Subquery, Sum
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 # Everything an event card needs, and nothing more. `exact_address`, `description`
@@ -32,10 +34,18 @@ class EventQuerySet(models.QuerySet):
         return self.filter(end_time__gte=now or timezone.now())
 
     def with_seats(self):
-        # Phase 4 replaces Value(0) with a Subquery summing 1 + plus_ones over CONFIRMED RSVPs.
-        return self.annotate(seats_used=Value(0, output_field=IntegerField())).annotate(
-            spots_left=F("capacity") - F("seats_used")
+        """Annotate seats_used (confirmed guests plus their plus-ones) and spots_left, in one query."""
+        RSVP = apps.get_model("rsvps", "RSVP")
+        used = (
+            RSVP.objects.filter(event=OuterRef("pk"), status="CONFIRMED")
+            .order_by()
+            .values("event")
+            .annotate(n=Sum(F("plus_ones") + 1))
+            .values("n")
         )
+        return self.annotate(
+            seats_used=Coalesce(Subquery(used, output_field=IntegerField()), 0)
+        ).annotate(spots_left=F("capacity") - F("seats_used"))
 
     def for_feed(self, now=None):
         return (

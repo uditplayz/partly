@@ -17,7 +17,12 @@ def create_draft(host, form):
 def update_event(event, form):
     if not event.is_editable:
         raise ValueError("Cancelled or completed events can't be edited.")
-    return form.save()
+    event = form.save()
+    # More room may have opened up. Imported here because rsvps depends on events.
+    from apps.rsvps.services import promote_waitlist
+
+    promote_waitlist(event.pk)
+    return event
 
 
 def delete_draft(event):

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django import forms
+from django.db.models import F, Sum
 from django.utils import timezone
 
 from .models import MAX_PLUS_ONES, Event
@@ -69,6 +70,10 @@ class EventForm(forms.ModelForm):
         value = self.cleaned_data["capacity"]
         if not 2 <= value <= 100:
             raise forms.ValidationError("Capacity must be between 2 and 100.")
+        if self.instance.pk:
+            taken = self.instance.rsvps.filter(status="CONFIRMED").aggregate(n=Sum(F("plus_ones") + 1))["n"] or 0
+            if value < taken:
+                raise forms.ValidationError(f"{taken} spots are already confirmed, so capacity can't go below that.")
         return value
 
     def clean_max_plus_ones(self):

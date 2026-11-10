@@ -50,16 +50,22 @@ class EventDetailView(DetailView):
     context_object_name = "event"
 
     def get_object(self, queryset=None):
-        event = get_object_or_404(Event.objects.select_related("host"), slug=self.kwargs["slug"])
+        event = get_object_or_404(Event.objects.select_related("host").with_seats(), slug=self.kwargs["slug"])
         if not event.is_visible_to(self.request.user):
             raise Http404
         return event
 
     def get_context_data(self, **kwargs):
-        event = self.object
+        event, user = self.object, self.request.user
+        is_host = event.is_host(user)
+        my_rsvp = event.rsvps.filter(user=user).first() if user.is_authenticated and not is_host else None
         return super().get_context_data(
-            address=event.address_for(self.request.user),
-            is_host=event.is_host(self.request.user),
+            address=event.address_for(user),
+            is_host=is_host,
+            my_rsvp=my_rsvp,
+            rsvp_open=event.status == Event.Status.PUBLISHED and timezone.now() < event.rsvp_deadline,
+            plus_one_range=range(event.max_plus_ones + 1),
+            pending_count=event.rsvps.filter(status="PENDING_APPROVAL").count() if is_host else 0,
             **kwargs,
         )
 

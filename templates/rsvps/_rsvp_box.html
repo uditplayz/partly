@@ -1,0 +1,53 @@
+{# The guest's RSVP state on an event page. Expects: event, my_rsvp, rsvp_open, plus_one_range, user. #}
+<section class="p-card rsvp-box">
+  {% if my_rsvp.status == 'CONFIRMED' %}
+    <p class="rsvp-box__state rsvp-box__state--in">You're in{% if my_rsvp.plus_ones %} · +{{ my_rsvp.plus_ones }}{% endif %}</p>
+    <p class="text-secondary">The exact address is unlocked above. Please keep it to yourself.</p>
+  {% elif my_rsvp.status == 'PENDING_APPROVAL' %}
+    <p class="rsvp-box__state">Waiting for the host</p>
+    <p class="text-secondary">{{ event.host.name }} approves guests for this one. The address unlocks once you're confirmed.</p>
+  {% elif my_rsvp.status == 'WAITLISTED' %}
+    <p class="rsvp-box__state">You're on the waitlist</p>
+    <p class="text-secondary">You'll get a spot automatically if one opens up, in the order people joined.</p>
+  {% elif my_rsvp.status == 'DECLINED' %}
+    <p class="rsvp-box__state">Not this time</p>
+    <p class="text-secondary mb-0">The host couldn't fit you in for this one.</p>
+  {% elif not rsvp_open %}
+    <p class="rsvp-box__state">RSVPs are closed</p>
+    <p class="text-secondary mb-0">The deadline for this event has passed.</p>
+  {% elif not user.is_authenticated %}
+    <a class="btn btn-accent rounded-pill w-100 py-2" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to RSVP</a>
+    <p class="form-text text-center mt-2 mb-0">New here? <a href="{% url 'accounts:signup' %}">Make an account</a></p>
+  {% else %}
+    <form method="post" action="{% url 'rsvps:create' event.slug %}">
+      {% csrf_token %}
+      {% if event.max_plus_ones %}
+        <div class="field">
+          <label class="form-label" for="rsvp-plus-ones">Bringing anyone?</label>
+          <select id="rsvp-plus-ones" name="plus_ones">
+            {% for n in plus_one_range %}<option value="{{ n }}">{% if n == 0 %}Just me{% else %}Me + {{ n }}{% endif %}</option>{% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      {% if event.requires_host_approval %}
+        <div class="field">
+          <label class="form-label" for="rsvp-note">A line for the host</label>
+          <input id="rsvp-note" type="text" name="note" maxlength="200" placeholder="Who are you, who do you know here?">
+        </div>
+      {% endif %}
+      <button type="submit" class="btn btn-accent rounded-pill w-100 py-2">
+        {% if event.requires_host_approval %}Request to join{% elif event.spots_left <= 0 %}Join the waitlist{% else %}I'm in{% endif %}
+      </button>
+      {% if event.spots_left <= 0 and not event.requires_host_approval %}
+        <p class="form-text text-center mt-2 mb-0">It's full right now. Waitlisted guests move up in order.</p>
+      {% endif %}
+    </form>
+  {% endif %}
+
+  {% if my_rsvp.is_active %}
+    <form method="post" action="{% url 'rsvps:cancel' event.slug %}" data-confirm="Cancel your RSVP?">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-primary rounded-pill px-4">Cancel my RSVP</button>
+    </form>
+  {% endif %}
+</section>

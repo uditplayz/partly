@@ -11,6 +11,7 @@ urlpatterns = [
     path("", include("apps.core.urls")),
     path("", include("apps.events.urls")),
     path("", include("apps.payments.urls")),
+    path("", include("apps.rsvps.urls")),
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:

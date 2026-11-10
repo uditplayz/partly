@@ -43,11 +43,11 @@ def test_no_alarm_red_in_design_css():
 
 
 def test_bottom_nav_marks_active_tab(auth_client):
-    html = auth_client.get(reverse("core:tickets")).content.decode()
+    html = auth_client.get(reverse("rsvps:tickets")).content.decode()
     assert 'bottom-nav__item is-active" href="/tickets/"' in html
 
 
-@pytest.mark.parametrize("name", ["core:tickets", "events:create", "events:my_hosting"])
+@pytest.mark.parametrize("name", ["rsvps:tickets", "events:create", "events:my_hosting"])
 def test_placeholder_sections_require_login(client, name):
     resp = client.get(reverse(name))
     assert resp.status_code == 302 and "/accounts/login/" in resp.url

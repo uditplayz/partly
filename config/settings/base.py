@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.events",
     "apps.payments",
+    "apps.rsvps",
 ]
 
 MIDDLEWARE = [
@@ -123,6 +124,7 @@ CELERY_TIMEZONE = TIME_ZONE
 
 # --- App --------------------------------------------------------------------
 SITE_NAME = "Partly"
+SITE_URL = env("SITE_URL", default="http://localhost:8000")  # used for links in emails
 PLATFORM_LISTING_FEE_INR = env("PLATFORM_LISTING_FEE_INR")
 
 # --- Payments (listing fee) -------------------------------------------------

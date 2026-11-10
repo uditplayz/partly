@@ -20,7 +20,7 @@
     <dl class="fact-list">
       <div><dt>When</dt><dd>{% when_label event %}<span class="text-secondary"> · until {{ event.end_time|clock }}</span></dd></div>
       <div><dt>Where</dt><dd>{{ event.area_name }}</dd></div>
-      <div><dt>Spots</dt><dd>{{ event.capacity }} people{% if event.max_plus_ones %} · up to {{ event.max_plus_ones }} plus-one{{ event.max_plus_ones|pluralize }} each{% endif %}</dd></div>
+      <div><dt>Spots</dt><dd>{{ event.capacity }} people{% if event.spots_left <= 0 %} · full{% elif event.seats_used %} · {{ event.spots_left }} left{% endif %}{% if event.max_plus_ones %} · up to {{ event.max_plus_ones }} plus-one{{ event.max_plus_ones|pluralize }} each{% endif %}</dd></div>
       <div><dt>Entry</dt><dd>{{ event.entry_label }}{% if event.entry_fee_notes %}<span class="text-secondary"> · {{ event.entry_fee_notes }}</span>{% endif %}</dd></div>
     </dl>
 
@@ -28,7 +28,7 @@
       <div class="address-box address-box--open">
         <p class="address-box__label">Exact address</p>
         <p class="address-box__value">{{ address|linebreaksbr }}</p>
-        <p class="address-box__hint">Only you and confirmed guests can see this.</p>
+        <p class="address-box__hint">Only the host and confirmed guests can see this.</p>
       </div>
     {% else %}
       <div class="address-box">
@@ -60,6 +60,9 @@
             <button type="submit" class="btn btn-accent rounded-pill px-4">Publish{% if PLATFORM_FEE %} · ₹{{ PLATFORM_FEE }}{% endif %}</button>
           </form>
         {% endif %}
+        {% if event.status == 'PUBLISHED' %}
+          <a class="btn btn-primary rounded-pill px-4" href="{% url 'rsvps:manage' event.slug %}">Manage guests{% if pending_count %} · {{ pending_count }} waiting{% endif %}</a>
+        {% endif %}
         {% if event.is_editable %}<a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'events:edit' event.slug %}">Edit</a>{% endif %}
         {% if event.status == 'DRAFT' %}
           <form method="post" action="{% url 'events:delete' event.slug %}" data-confirm="Delete this draft?">
@@ -67,11 +70,15 @@
             <button type="submit" class="btn btn-outline-primary rounded-pill px-4">Delete draft</button>
           </form>
         {% endif %}
+        {% if event.status == 'PUBLISHED' %}
+          <form method="post" action="{% url 'rsvps:cancel_event' event.slug %}" data-confirm="Cancel this event? Every RSVP will be released. This can't be undone.">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary rounded-pill px-4">Cancel event</button>
+          </form>
+        {% endif %}
       </div>
     </section>
   {% else %}
-    <div class="sticky-cta">
-      <button type="button" class="btn btn-accent rounded-pill w-100 py-2" disabled>RSVPs open soon</button>
-    </div>
+    {% include "rsvps/_rsvp_box.html" %}
   {% endif %}
 {% endblock %}

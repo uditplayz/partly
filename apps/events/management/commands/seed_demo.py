@@ -29,6 +29,8 @@ AREAS = [
     "FC Road", "Kothrud", "Hostel Block C", "Hinjewadi Phase 1", "Camp",
 ]
 
+GUESTS = [("demo_guest_isha", "Isha"), ("demo_guest_arjun", "Arjun"), ("demo_guest_zoya", "Zoya"), ("demo_guest_dev", "Dev")]
+
 IDEAS = {
     Vibe.HOUSE_PARTY: [("Rooftop house party", 40, 6), ("Friday night mixer", 60, 5), ("Housewarming, come through", 25, 6)],
     Vibe.JAM: [("Acoustic jam: bring your guitar", 12, 4), ("Open mic + chai", 20, 3), ("Bollywood unplugged night", 15, 4)],
@@ -99,6 +101,20 @@ class Command(BaseCommand):
             ))
         for event in events:
             event.save()  # save() (not bulk_create) so each gets a slug
+
+        # A few confirmed guests so spot counters on the feed aren't all empty.
+        from apps.rsvps.models import RSVP
+
+        guests = [self._host(username, name, rng.choice(AREAS)) for username, name in GUESTS]
+        for event in events[::2]:
+            seats = 0
+            for guest in rng.sample(guests, rng.randint(1, len(guests))):
+                plus = rng.randint(0, event.max_plus_ones)
+                if seats + 1 + plus > event.capacity:
+                    continue
+                RSVP.objects.create(event=event, user=guest, status=RSVP.Status.CONFIRMED,
+                                    plus_ones=plus, confirmed_at=timezone.now())
+                seats += 1 + plus
         self.stdout.write(self.style.SUCCESS(
             f"Seeded {len(events)} events from {len(hosts)} hosts. Demo login: demo_aditi / {DEMO_PASSWORD}"
         ))

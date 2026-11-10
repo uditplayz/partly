@@ -7,7 +7,7 @@
     <nav class="top-nav__links d-none d-md-flex" aria-label="Primary">
       <a class="top-nav__link {% nav_active 'events:feed' %}" href="{% url 'events:feed' %}">Explore</a>
       <a class="top-nav__link {% nav_active 'events:my_hosting' %}" href="{% url 'events:my_hosting' %}">Hosting</a>
-      <a class="top-nav__link {% nav_active 'core:tickets' %}" href="{% url 'core:tickets' %}">My Tickets</a>
+      <a class="top-nav__link {% nav_active 'rsvps:tickets' %}" href="{% url 'rsvps:tickets' %}">My Tickets</a>
       {% if user.is_authenticated %}
         <a class="top-nav__link {% nav_active 'accounts:profile' %}" href="{% url 'accounts:profile' %}">
           <span class="avatar avatar--sm" aria-hidden="true">{{ user.initials }}</span>{{ user.name }}

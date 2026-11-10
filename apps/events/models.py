@@ -120,8 +120,10 @@ class Event(models.Model):
         return bool(user and user.is_authenticated and user.pk == self.host_id)
 
     def address_for(self, user):
-        """The single gate for the private address. Phase 4 adds confirmed guests."""
+        """The single gate for the private address: the host and confirmed guests only."""
         if self.is_host(user):
+            return self.exact_address
+        if user and user.is_authenticated and self.rsvps.filter(user=user, status="CONFIRMED").exists():
             return self.exact_address
         return None
 
