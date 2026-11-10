@@ -1,0 +1,118 @@
+/* Partly design tokens. Overrides Bootstrap 5.3 CSS variables.
+   Warm paper light / deep charcoal dark, sage + terracotta accents, 12px radii,
+   and no alarm-red anywhere (danger is remapped to a calm clay tone). */
+
+:root,
+[data-bs-theme="light"] {
+  /* Brand palette */
+  --p-paper: #FAF7F2;
+  --p-surface: #FFFFFF;
+  --p-surface-2: #F3EEE6;
+  --p-ink: #1C1A17;
+  --p-ink-soft: #3A362F;
+  --p-muted: #6E675D;
+  --p-line: #E7E0D4;
+  --p-sage: #5E7D6A;
+  --p-sage-strong: #4C6957;
+  --p-sage-soft: #E2EAE4;
+  --p-terracotta: #C4704F;
+  --p-terracotta-soft: #F6E4DA;
+  --p-clay-ink: #8A4A31;
+  --p-butter-soft: #F5ECCF;
+  --p-sky-soft: #DFE8EE;
+  --p-plum-soft: #EBE0EA;
+  --p-shadow: 0 1px 2px rgba(28, 26, 23, .04), 0 6px 20px rgba(28, 26, 23, .06);
+
+  /* Shape and type */
+  --p-radius: 12px;
+  --p-radius-lg: 18px;
+  --p-radius-pill: 999px;
+  --p-font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --p-font-display: "Bricolage Grotesque", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --p-nav-h: 64px;
+
+  /* Bootstrap bridge */
+  --bs-body-bg: var(--p-paper);
+  --bs-body-bg-rgb: 250, 247, 242;
+  --bs-body-color: var(--p-ink);
+  --bs-body-color-rgb: 28, 26, 23;
+  --bs-body-font-family: var(--p-font-body);
+  --bs-body-font-size: 1rem;
+  --bs-body-line-height: 1.55;
+  --bs-emphasis-color: var(--p-ink);
+  --bs-heading-color: var(--p-ink);
+  --bs-secondary-color: var(--p-muted);
+  --bs-secondary-bg: var(--p-surface-2);
+  --bs-tertiary-bg: var(--p-surface-2);
+  --bs-border-color: var(--p-line);
+  --bs-border-radius: var(--p-radius);
+  --bs-border-radius-sm: 8px;
+  --bs-border-radius-lg: var(--p-radius-lg);
+  --bs-border-radius-pill: var(--p-radius-pill);
+  --bs-primary: var(--p-sage);
+  --bs-primary-rgb: 94, 125, 106;
+  --bs-primary-text-emphasis: var(--p-sage-strong);
+  --bs-primary-bg-subtle: var(--p-sage-soft);
+  --bs-link-color: var(--p-sage-strong);
+  --bs-link-color-rgb: 76, 105, 87;
+  --bs-link-hover-color: var(--p-ink);
+  --bs-link-hover-color-rgb: 28, 26, 23;
+  --bs-focus-ring-color: rgba(94, 125, 106, .3);
+  /* No alarm red: danger maps to a calm clay */
+  --bs-danger: var(--p-clay-ink);
+  --bs-danger-rgb: 138, 74, 49;
+  --bs-danger-text-emphasis: var(--p-clay-ink);
+  --bs-danger-bg-subtle: var(--p-terracotta-soft);
+  --bs-danger-border-subtle: #EBC9B8;
+  --bs-form-invalid-color: var(--p-clay-ink);
+  --bs-form-invalid-border-color: var(--p-terracotta);
+  --bs-form-valid-color: var(--p-sage-strong);
+  --bs-form-valid-border-color: var(--p-sage);
+}
+
+[data-bs-theme="dark"] {
+  --p-paper: #1C1A17;
+  --p-surface: #25221E;
+  --p-surface-2: #2E2A25;
+  --p-ink: #F1ECE3;
+  --p-ink-soft: #D8D1C5;
+  --p-muted: #A79F92;
+  --p-line: #39342D;
+  --p-sage: #8DAE99;
+  --p-sage-strong: #A9C6B3;
+  --p-sage-soft: #2B3530;
+  --p-terracotta: #D98A69;
+  --p-terracotta-soft: #3A2A22;
+  --p-clay-ink: #E3A386;
+  --p-butter-soft: #36321F;
+  --p-sky-soft: #24303A;
+  --p-plum-soft: #342A33;
+  --p-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+
+  --bs-body-bg: var(--p-paper);
+  --bs-body-bg-rgb: 28, 26, 23;
+  --bs-body-color: var(--p-ink);
+  --bs-body-color-rgb: 241, 236, 227;
+  --bs-emphasis-color: var(--p-ink);
+  --bs-heading-color: var(--p-ink);
+  --bs-secondary-color: var(--p-muted);
+  --bs-secondary-bg: var(--p-surface-2);
+  --bs-tertiary-bg: var(--p-surface-2);
+  --bs-border-color: var(--p-line);
+  --bs-primary: var(--p-sage);
+  --bs-primary-rgb: 141, 174, 153;
+  --bs-primary-text-emphasis: var(--p-sage-strong);
+  --bs-primary-bg-subtle: var(--p-sage-soft);
+  --bs-link-color: var(--p-sage-strong);
+  --bs-link-color-rgb: 169, 198, 179;
+  --bs-link-hover-color: var(--p-ink);
+  --bs-link-hover-color-rgb: 241, 236, 227;
+  --bs-danger: var(--p-clay-ink);
+  --bs-danger-rgb: 227, 163, 134;
+  --bs-danger-text-emphasis: var(--p-clay-ink);
+  --bs-danger-bg-subtle: var(--p-terracotta-soft);
+  --bs-danger-border-subtle: #5A3B2E;
+  --bs-form-invalid-color: var(--p-clay-ink);
+  --bs-form-invalid-border-color: var(--p-terracotta);
+  color-scheme: dark;
+}

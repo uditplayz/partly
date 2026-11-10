@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Logging out · {{ SITE_NAME }}{% endblock %}
+{% block extra_head %}<noscript><meta http-equiv="refresh" content="0;url={{ next_url }}"></noscript>{% endblock %}
+{% block content %}
+  <div class="p-card empty-state mt-4" data-logout-redirect="{{ next_url }}">
+    <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+    <h1 class="h4">You're logged out</h1>
+    <p class="text-secondary mb-3">Clearing saved passes from this device…</p>
+    <a class="btn btn-outline-primary rounded-pill px-4" href="{{ next_url }}">Continue</a>
+  </div>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/logout.js' %}" defer></script>{% endblock %}

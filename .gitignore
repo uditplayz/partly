@@ -2,3 +2,12 @@
 # local MCP config (may contain API keys)
 .mcp.json
 .vscode/mcp.json
+
+# python / django
+.venv/
+__pycache__/
+*.pyc
+.env
+staticfiles/
+media/
+.pytest_cache/

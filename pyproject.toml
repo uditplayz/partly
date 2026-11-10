@@ -1,0 +1,11 @@
+[project]
+name = "partly"
+version = "0.1.0"
+description = "Find parties near you and get on the guest list."
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py"]
+testpaths = ["apps"]
+addopts = "-ra --strict-markers"

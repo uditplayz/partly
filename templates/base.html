@@ -1,0 +1,56 @@
+{% load static %}<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Find house parties, jams, workshops and chai breaks near you.{% endblock %}">
+
+  {# Apply the saved theme before first paint to avoid a flash. #}
+  <script>
+    (function () {
+      var pref = "auto";
+      try { pref = localStorage.getItem("partly-theme") || "auto"; } catch (e) {}
+      var dark = pref === "dark" || (pref === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.setAttribute("data-bs-theme", dark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme-pref", pref);
+    })();
+  </script>
+
+  <link rel="manifest" href="{% url 'core:manifest' %}">
+  <meta name="theme-color" content="{{ PWA_THEME_COLOR_LIGHT }}" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="{{ PWA_THEME_COLOR_DARK }}" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Partly">
+  <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap">
+
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}{% if not hide_nav %} has-bottom-nav{% endif %}">
+  <a class="visually-hidden-focusable skip-link" href="#main">Skip to content</a>
+
+  {% if not hide_nav %}{% include "partials/top_nav.html" %}{% endif %}
+
+  <main id="main" class="app-main container-narrow">
+    {% include "partials/flash.html" %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if not hide_nav %}{% include "partials/bottom_nav.html" %}{% endif %}
+
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
+  <script src="{% static 'js/app.js' %}" defer></script>
+  <script src="{% static 'js/sw-register.js' %}" data-sw-url="{% url 'core:serviceworker' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Log in · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="auth-card p-card">
+    <h1 class="display-title display-title--sm">Welcome back</h1>
+    <p class="text-secondary">Log in to RSVP and see your passes.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for error in form.non_field_errors %}<div class="notice">{{ error }}</div>{% endfor %}
+      {% for field in form %}{% include "partials/form_field.html" %}{% endfor %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-primary w-100 rounded-pill py-2 mt-2" type="submit">Log in</button>
+    </form>
+    <p class="text-center mt-3 mb-0 small">New here? <a href="{% url 'accounts:signup' %}">Make an account</a></p>
+  </section>
+{% endblock %}

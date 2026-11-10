@@ -1,0 +1,8 @@
+Django>=5.2.19,<5.3
+psycopg[binary]>=3.3,<3.4
+django-environ>=0.14,<0.15
+whitenoise>=6.12,<7
+celery[redis]>=5.7,<5.8
+redis>=8.1,<9
+django-celery-beat>=2.9,<3
+segno>=1.6,<2

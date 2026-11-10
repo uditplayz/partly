@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.name }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="p-card profile-card">
+    <div class="profile-card__head">
+      <span class="avatar avatar--lg" aria-hidden="true">{{ profile_user.initials }}</span>
+      <div>
+        <h1 class="h3 mb-0">{{ profile_user.name }}</h1>
+        <p class="text-secondary mb-0">@{{ profile_user.username }}{% if profile_user.campus_tag %} · {{ profile_user.campus_tag }}{% endif %}</p>
+      </div>
+    </div>
+
+    <div class="trust-chip{% if profile_user.is_new_member %} trust-chip--new{% endif %}">
+      {% if profile_user.is_new_member %}New to Partly{% else %}Trust {{ profile_user.trust_score }}{% endif %}
+    </div>
+
+    {% if profile_user.bio %}<p class="mt-3 mb-0">{{ profile_user.bio|linebreaksbr }}</p>{% endif %}
+
+    {% if profile_user.vibe_tags %}
+      <div class="pill-row mt-3 mb-0">
+        {% for value, label in profile_user.vibe_tag_pairs %}<span class="vibe-pill vibe-pill--{{ value }}">{{ label }}</span>{% endfor %}
+      </div>
+    {% endif %}
+  </section>
+
+  {% if is_own_profile %}
+    <section class="p-card settings-list">
+      <a class="settings-list__row" href="{% url 'accounts:profile_edit' %}">Edit profile <span aria-hidden="true">›</span></a>
+      <div class="settings-list__row">
+        <span>Appearance</span>
+        <div class="segmented" role="radiogroup" aria-label="Theme" data-theme-switch>
+          <button type="button" role="radio" data-theme-value="light">Light</button>
+          <button type="button" role="radio" data-theme-value="auto">Auto</button>
+          <button type="button" role="radio" data-theme-value="dark">Dark</button>
+        </div>
+      </div>
+      <form method="post" action="{% url 'accounts:logout' %}" class="settings-list__row">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link p-0 text-reset text-decoration-none">Log out</button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

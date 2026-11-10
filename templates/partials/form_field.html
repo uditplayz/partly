@@ -1,0 +1,17 @@
+<div class="field{% if field.errors %} field--error{% endif %}">
+  {% if field.widget_type == 'checkboxselectmultiple' %}
+    <span class="form-label">{{ field.label }}</span>
+    <div class="chip-select">
+      {% for option in field %}
+        <label class="chip-select__chip">
+          {{ option.tag }}<span>{{ option.choice_label }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  {% else %}
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+  {% for error in field.errors %}<div class="field__error">{{ error }}</div>{% endfor %}
+</div>

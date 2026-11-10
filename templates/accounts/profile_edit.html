@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Edit profile · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="p-card">
+    <h1 class="h3">Edit profile</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}{% include "partials/form_field.html" %}{% endfor %}
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary rounded-pill px-4" type="submit">Save</button>
+        <a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'accounts:profile' %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

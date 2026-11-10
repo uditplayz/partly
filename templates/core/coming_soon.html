@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="page-head">
+    <h1 class="display-title">{{ title }}</h1>
+  </section>
+  <div class="p-card empty-state">
+    <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="text-secondary mb-0">{{ body }}</p>
+  </div>
+{% endblock %}
