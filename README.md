@@ -111,7 +111,7 @@ celery -A config beat -l info
 pytest
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) runs the same suite on Linux against PostgreSQL, plus a migrations check and Django's deploy checks on the production settings.
+GitHub Actions (`.github/workflows/ci.yml`) installs from `requirements-dev.lock` (exact versions with hashes; regenerate with `pip-compile --generate-hashes --allow-unsafe --strip-extras -o requirements-dev.lock requirements-dev.txt` after changing `requirements*.txt`) and runs the same suite on Linux against PostgreSQL, plus a migrations check and Django's deploy checks on the production settings.
 
 Tests run against a real PostgreSQL database. The test runner creates and removes `test_partly` itself, so the database user needs permission to create databases.
 

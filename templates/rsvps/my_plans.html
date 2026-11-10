@@ -46,7 +46,7 @@
                   <button type="button" class="btn-close pass-modal__close" data-bs-dismiss="modal" aria-label="Close"></button>
                   <p class="eyebrow mb-1">{% when_label rsvp.event now %} · {{ rsvp.event.area_name }}</p>
                   <h2 class="h4" id="pass-title-{{ rsvp.pk }}">{{ rsvp.event.title }}</h2>
-                  <div class="pass-modal__qr">{{ rsvp.qr_svg|safe }}</div>
+                  <div class="pass-modal__qr">{{ rsvp.qr_svg }}</div>
                   <p class="pass-modal__name">{{ user.name }}{% if rsvp.plus_ones %} <span>+{{ rsvp.plus_ones }}</span>{% endif %}</p>
                   <p class="text-secondary mb-0">{% if rsvp.checked_in %}Already checked in.{% else %}Show this to the host at the door. Turn your brightness up.{% endif %}</p>
                 </div>

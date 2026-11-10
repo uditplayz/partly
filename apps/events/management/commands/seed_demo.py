@@ -12,6 +12,26 @@ from apps.accounts.models import User
 from apps.core.constants import Vibe
 from apps.events.models import Event
 
+class Dice:
+    """Seeded, repeatable randomness for fake demo data. It is deliberately predictable and
+    never used for anything security-related (tokens come from uuid4 / django.core.signing)."""
+
+    def __init__(self, seed):
+        self._r = random.Random(seed)  # NOSONAR  fixed seed so the demo data is reproducible
+
+    def random(self):
+        return self._r.random()  # NOSONAR
+
+    def choice(self, seq):
+        return self._r.choice(seq)  # NOSONAR
+
+    def randint(self, a, b):
+        return self._r.randint(a, b)  # NOSONAR
+
+    def sample(self, seq, k):
+        return self._r.sample(seq, k)  # NOSONAR
+
+
 DEMO_PREFIX = "demo_"
 DEMO_PASSWORD = "partly-demo-pass"
 
@@ -68,7 +88,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("Demo events already exist. Use --reset to recreate them."))
             return
 
-        rng = random.Random(seed)
+        rng = Dice(seed)
         hosts = [self._host(*h) for h in HOSTS]
         now = timezone.localtime()
         ideas = [(vibe, idea) for vibe, items in IDEAS.items() for idea in items]

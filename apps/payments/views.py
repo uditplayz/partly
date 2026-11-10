@@ -88,7 +88,9 @@ def status(request, order_id):
     })
 
 
-@csrf_exempt
+# The provider's server calls this, so there is no CSRF cookie. Authenticity comes from the
+# HMAC signature checked in handle_webhook, and nothing is changed without a valid one.
+@csrf_exempt  # NOSONAR
 @require_POST
 def webhook(request, provider):
     # Only the configured provider's webhook exists. In production that hides the mock one.

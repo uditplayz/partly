@@ -8,6 +8,7 @@ import uuid
 
 import segno
 from django.core import signing
+from django.utils.safestring import mark_safe
 
 SALT = "partly.checkin"
 MAX_PAYLOAD_LENGTH = 512
@@ -36,7 +37,8 @@ def _code(rsvp):
 
 def svg_inline(rsvp, scale=6):
     """SVG markup to place straight into a page (no XML declaration)."""
-    return _code(rsvp).svg_inline(scale=scale, border=3, dark=DARK, light=LIGHT)
+    # segno builds this SVG from a signed token; no user-supplied text ends up in the markup.
+    return mark_safe(_code(rsvp).svg_inline(scale=scale, border=3, dark=DARK, light=LIGHT))  # noqa: S308
 
 
 def svg_bytes(rsvp, scale=8):

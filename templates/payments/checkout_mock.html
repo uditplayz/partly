@@ -9,7 +9,7 @@
     <p class="pay-card__amount">₹{{ payment.amount_display }}</p>
     <p class="text-secondary">One-time fee to publish <strong>{{ event.title }}</strong> on the feed.</p>
 
-    <div class="pay-card__qr" aria-label="UPI QR code">{{ upi_qr_svg|safe }}</div>
+    <div class="pay-card__qr" aria-label="UPI QR code">{{ upi_qr_svg }}</div>
     <p class="pay-card__upi">UPI ID <strong>{{ upi_id }}</strong></p>
     <p class="pay-card__order">Order {{ payment.provider_order_id }}</p>
 

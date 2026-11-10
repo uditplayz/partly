@@ -7,6 +7,7 @@ import secrets
 
 import segno
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 from .base import BaseProvider, InvalidSignature, WebhookEvent
 
@@ -58,4 +59,4 @@ class MockProvider(BaseProvider):
     def checkout_context(self, payment, request):
         upi = f"upi://pay?pa=partly@mockbank&pn=Partly&am={payment.amount_display}&cu=INR&tn={payment.provider_order_id}"
         qr = segno.make(upi, error="m").svg_inline(scale=4, border=2, dark="#1C1A17", light="#FFFFFF")
-        return {"upi_qr_svg": qr, "upi_id": "partly@mockbank"}
+        return {"upi_qr_svg": mark_safe(qr), "upi_id": "partly@mockbank"}
