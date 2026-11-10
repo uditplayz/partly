@@ -31,7 +31,7 @@ class EventForm(forms.ModelForm):
             "title", "vibe_category", "description",
             "area_name", "exact_address",
             "start_time", "end_time", "rsvp_deadline",
-            "capacity", "max_plus_ones", "requires_host_approval",
+            "capacity", "max_plus_ones", "requires_host_approval", "min_age",
             "is_free_entry", "venue_entry_fee_inr", "entry_fee_notes",
         )
         labels = {
@@ -65,6 +65,8 @@ class EventForm(forms.ModelForm):
         for name in ("start_time", "end_time"):
             self.fields[name].input_formats = [DT_FORMAT]
         self.fields["venue_entry_fee_inr"].required = False
+        self.fields["min_age"].required = False
+        self.fields["min_age"].empty_value = 0
 
     def clean_capacity(self):
         value = self.cleaned_data["capacity"]
@@ -95,6 +97,9 @@ class EventForm(forms.ModelForm):
             cd["rsvp_deadline"] = start
         elif start and deadline and deadline > start:
             self.add_error("rsvp_deadline", "The RSVP deadline can't be after the start.")
+
+        if cd.get("vibe_category") == "DRINKS" and not cd.get("min_age"):
+            self.add_error("min_age", "Events with drinks need an age rule (18 or 21 and over).")
 
         fee = cd.get("venue_entry_fee_inr") or Decimal("0")
         if cd.get("is_free_entry"):

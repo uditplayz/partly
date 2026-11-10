@@ -36,6 +36,9 @@
           <input id="rsvp-note" type="text" name="note" maxlength="200" placeholder="Who are you, who do you know here?">
         </div>
       {% endif %}
+      {% if event.min_age %}
+        <label class="toggle-row" for="rsvp-age"><span>I'm {{ event.min_age }} or over</span><input type="checkbox" name="age_confirmed" id="rsvp-age" class="toggle" required></label>
+      {% endif %}
       <button type="submit" class="btn btn-accent rounded-pill w-100 py-2">
         {% if event.requires_host_approval %}Request to join{% elif event.spots_left <= 0 %}Join the waitlist{% else %}I'm in{% endif %}
       </button>

@@ -38,5 +38,17 @@ CELERY_BROKER_URL = env("REDIS_URL")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_TASK_ALWAYS_EAGER = False
 
+# --- Error monitoring (optional). No personal data is sent: send_default_pii stays False. ---
+_SENTRY_DSN = env("SENTRY_DSN", default="")
+if _SENTRY_DSN:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=_SENTRY_DSN,
+        environment=env("SENTRY_ENVIRONMENT", default="production"),
+        send_default_pii=False,
+        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0),
+    )
+
 # The container health check talks plain HTTP from inside the container.
 SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]

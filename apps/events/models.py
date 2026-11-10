@@ -53,6 +53,10 @@ class Event(models.Model):
     capacity = models.PositiveSmallIntegerField(default=10)
     max_plus_ones = models.PositiveSmallIntegerField(default=0)
     requires_host_approval = models.BooleanField(default=False)
+    min_age = models.PositiveSmallIntegerField(
+        "age rule", choices=[(0, "Anyone (18+ members)"), (18, "18 and over"), (21, "21 and over")], default=0,
+        help_text="Guests must confirm they meet this when they RSVP. Required for Drinks events.",
+    )
 
     is_free_entry = models.BooleanField(default=True)
     venue_entry_fee_inr = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal("0"))

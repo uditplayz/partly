@@ -46,6 +46,13 @@
     {% block content %}{% endblock %}
   </main>
 
+  <footer class="site-footer container-narrow">
+    <a href="{% url 'core:terms' %}">Terms</a>
+    <a href="{% url 'core:privacy' %}">Privacy</a>
+    <a href="{% url 'core:refunds' %}">Refunds</a>
+    <a href="mailto:{{ SUPPORT_EMAIL }}">Contact</a>
+  </footer>
+
   {% if not hide_nav %}{% include "partials/bottom_nav.html" %}{% endif %}
 
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>

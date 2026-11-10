@@ -1,8 +1,8 @@
 # Production-shaped stack: web + worker + beat on one Postgres and one Redis.
 #   cp .env.production.example .env.production   (then fill it in)
 #   docker compose up -d --build
-# TLS is not handled here. Put a reverse proxy (Caddy, nginx, a cloud load balancer) in front of
-# port 8000 and have it send X-Forwarded-Proto: https.
+# Caddy terminates HTTPS on ports 80/443 and proxies to the web container (never exposed directly).
+# Set DOMAIN in .env.production (and POSTGRES_PASSWORD in your shell).
 x-app: &app
   build: .
   image: partly:latest
@@ -47,11 +47,22 @@ services:
   web:
     <<: *app
     command: ["web"]
-    ports: ["8000:8000"]
+    expose: ["8000"]
     depends_on:
       migrate: {condition: service_completed_successfully}
       db: {condition: service_healthy}
       redis: {condition: service_healthy}
+
+  caddy:
+    image: caddy:2-alpine
+    env_file: .env.production
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+    restart: unless-stopped
 
   worker:
     <<: *app
@@ -74,3 +85,5 @@ services:
 volumes:
   pgdata:
   redisdata:
+  caddy_data:
+  caddy_config:

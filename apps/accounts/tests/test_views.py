@@ -16,6 +16,7 @@ def signup_data(**overrides):
         "campus_tag": "COEP",
         "password1": "S0me-strong-pass!",
         "password2": "S0me-strong-pass!",
+        "accept_terms": "on",
     }
     data.update(overrides)
     return data

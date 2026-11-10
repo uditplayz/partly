@@ -21,6 +21,7 @@
       <div><dt>When</dt><dd>{% when_label event %}<span class="text-secondary"> · until {{ event.end_time|clock }}</span></dd></div>
       <div><dt>Where</dt><dd>{{ event.area_name }}</dd></div>
       <div><dt>Spots</dt><dd>{{ event.capacity }} people{% if event.spots_left <= 0 %} · full{% elif event.seats_used %} · {{ event.spots_left }} left{% endif %}{% if event.max_plus_ones %} · up to {{ event.max_plus_ones }} plus-one{{ event.max_plus_ones|pluralize }} each{% endif %}</dd></div>
+      {% if event.min_age %}<div><dt>Age</dt><dd>{{ event.min_age }} and over</dd></div>{% endif %}
       <div><dt>Entry</dt><dd>{{ event.entry_label }}{% if event.entry_fee_notes %}<span class="text-secondary"> · {{ event.entry_fee_notes }}</span>{% endif %}</dd></div>
     </dl>
 
@@ -39,6 +40,10 @@
 
     {% if event.description %}
       <div class="event-detail__body">{{ event.description|linebreaks }}</div>
+    {% endif %}
+
+    {% if user.is_authenticated and user.pk != event.host_id %}
+      <p class="small mb-0"><a href="{% url 'safety:report' 'event' event.slug %}">Report this event</a></p>
     {% endif %}
 
     <a class="host-row" href="{% url 'public_profile' event.host.username %}">

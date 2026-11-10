@@ -3,6 +3,8 @@ from django.conf import settings
 
 def site(request):
     return {
+        "LEGAL_ENTITY_NAME": settings.LEGAL_ENTITY_NAME,
+        "SUPPORT_EMAIL": settings.SUPPORT_EMAIL,
         "csp_nonce": getattr(request, "csp_nonce", ""),
         "SITE_NAME": settings.SITE_NAME,
         "PLATFORM_FEE": settings.PLATFORM_LISTING_FEE_INR,

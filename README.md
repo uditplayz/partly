@@ -28,6 +28,10 @@ Partly is built around a few rules:
 | RSVPs | Capacity limits, optional host approval, waitlist, email invitations, My Tickets, guest manager for hosts | ✅ Built |
 | Check-in | Signed QR pass for each guest; the host scans it with a phone camera, with a manual fallback and live counts | ✅ Built (camera untested on device) |
 | Email | Confirmations with the QR pass, host alerts, invitations, cancellation notices, reminders 24 h and 2 h before start (HTML and plain text, sent by Celery) | ✅ Built |
+| Safety | Report an event or member, block members (both directions), staff review queue in the admin with take-down and suspend actions | ✅ Built |
+| Age rule | Hosts can set 18+ or 21+ (required for Drinks events); guests confirm when they RSVP. Signup asks for an 18+ and terms confirmation | ✅ Built |
+| Account deletion | Password-confirmed; anonymises the account, cancels RSVPs and live events, keeps payment records | ✅ Built |
+| Legal pages | Terms, Privacy and Refund policy at `/terms/`, `/privacy/`, `/refunds/` (drafts: have them reviewed before launch) | ✅ Built |
 | Trust | Stored score from attendance, hosting and host cancellations, recomputed after each event and nightly | ✅ Built |
 
 ## Tech stack
@@ -87,6 +91,9 @@ All settings come from environment variables, loaded from `.env`:
 | `DATABASE_URL` | `postgres://postgres@localhost:5432/partly` | PostgreSQL connection |
 | `REDIS_URL` | `redis://localhost:6379/0` | Celery broker. Required in production (no fallback) |
 | `CELERY_TASK_ALWAYS_EAGER` | `True` in dev, `False` elsewhere | Run tasks inline without Redis. Forced off in production |
+| `LEGAL_ENTITY_NAME`, `SUPPORT_EMAIL`, `LEGAL_LAST_UPDATED` | placeholders | Shown on the legal pages and footer. Set them to the real operator |
+| `DOMAIN` | none | Production only: the domain Caddy gets an HTTPS certificate for |
+| `SENTRY_DSN` | empty | Optional error monitoring. No personal data is sent |
 | `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` | console backend in dev, SMTP in production | Where email goes |
 | `PLATFORM_LISTING_FEE_INR` | `49` | Fee charged to publish an event. `0` publishes without checkout |
 | `PAYMENT_PROVIDER` | `mock` | `mock` (sandbox, no real money) or `razorpay`. Production refuses `mock` unless `ALLOW_MOCK_PAYMENTS=True` |
@@ -115,9 +122,9 @@ export POSTGRES_PASSWORD=choose-a-strong-one
 docker compose up -d --build
 ```
 
-The image installs from `requirements.lock` (exact versions with hashes, wheels only), runs as a non-root user and serves hashed static files through WhiteNoise. `/healthz/` checks the database. TLS is not included: put a reverse proxy in front of port 8000 that sends `X-Forwarded-Proto: https`, and keep `SECURE_SSL_REDIRECT` on. Set `SECURE_SSL_REDIRECT=False` only to try the stack over plain HTTP on your own machine. Regenerate both lock files with `pip-compile` after changing `requirements*.txt`.
+The image installs from `requirements.lock` (exact versions with hashes, wheels only), runs as a non-root user and serves hashed static files through WhiteNoise. `/healthz/` checks the database. A Caddy container terminates HTTPS on ports 80 and 443 and gets its certificate automatically for `DOMAIN` (DNS must already point at the server). The web container is not exposed directly. For a local trial set `DOMAIN=localhost` and `SITE_URL=https://localhost`; Caddy then uses its own local certificate. Regenerate both lock files with `pip-compile` after changing `requirements*.txt`.
 
-Checked on this project: the stack builds and comes up with Docker on Windows, `/healthz/` and the feed return 200, hashed static files are served, the security headers are present, and the worker connects to Redis. Not checked: a real server with a domain and TLS, real SMTP, Razorpay live, backups of the `pgdata` volume (set those up yourself).
+Checked on this project: with `DOMAIN=localhost`, HTTPS through Caddy works, http redirects to https, port 8000 is not reachable from outside, and the stack builds and comes up with Docker on Windows, `/healthz/` and the feed return 200, hashed static files are served, the security headers are present, and the worker connects to Redis. Not checked: a real server with a real domain and certificate, real SMTP, Razorpay live, backups of the `pgdata` volume (set those up yourself).
 
 ### Running tests
 

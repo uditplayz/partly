@@ -31,7 +31,10 @@ def rsvp_create(request, slug):
         messages.info(request, "Check the number of plus-ones and try again.")
         return redirect(event.get_absolute_url())
     try:
-        rsvp = services.request_rsvp(request.user, event, form.cleaned_data["plus_ones"], form.cleaned_data["note"])
+        rsvp = services.request_rsvp(
+            request.user, event, form.cleaned_data["plus_ones"], form.cleaned_data["note"],
+            age_confirmed=form.cleaned_data["age_confirmed"],
+        )
     except services.RSVPError as exc:
         messages.info(request, str(exc))
         return redirect(event.get_absolute_url())
@@ -210,7 +213,8 @@ def invitation(request, token):
                 return redirect("events:feed")
             form = RSVPForm(request.POST)
             plus_ones = form.cleaned_data["plus_ones"] if form.is_valid() else 0
-            rsvp = services.accept_invitation(token, request.user, plus_ones)
+            aged = form.is_valid() and form.cleaned_data["age_confirmed"]
+            rsvp = services.accept_invitation(token, request.user, plus_ones, age_confirmed=aged)
             messages.success(
                 request,
                 "You're in. The address is unlocked below." if rsvp.status == Status.CONFIRMED

@@ -91,3 +91,11 @@ def healthz(request):
     except Exception:  # noqa: BLE001
         return JsonResponse({"ok": False}, status=503)
     return JsonResponse({"ok": True})
+
+
+LEGAL_PAGES = {"terms": "legal/terms.html", "privacy": "legal/privacy.html", "refunds": "legal/refunds.html"}
+
+
+@require_GET
+def legal(request, page):
+    return render(request, LEGAL_PAGES[page], {"fee": settings.PLATFORM_LISTING_FEE_INR, "updated": settings.LEGAL_LAST_UPDATED})

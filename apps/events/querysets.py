@@ -57,5 +57,14 @@ class EventQuerySet(models.QuerySet):
             .order_by("start_time", "id")
         )
 
+    def visible_to(self, user):
+        """Leave out events whose host is blocked by the viewer, or has blocked the viewer."""
+        if user is None or not user.is_authenticated:
+            return self
+        Block = apps.get_model("safety", "Block")
+        mine = Block.objects.filter(blocker=user).values("blocked_id")
+        theirs = Block.objects.filter(blocked=user).values("blocker_id")
+        return self.exclude(host_id__in=mine).exclude(host_id__in=theirs)
+
     def hosted_by(self, user):
         return self.filter(host=user)

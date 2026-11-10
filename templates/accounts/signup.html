@@ -8,6 +8,7 @@
       {% csrf_token %}
       {% for error in form.non_field_errors %}<div class="notice">{{ error }}</div>{% endfor %}
       {% for field in form %}{% include "partials/form_field.html" %}{% endfor %}
+      <p class="form-text mt-0">Read the <a href="{% url 'core:terms' %}" target="_blank" rel="noopener">Terms</a> and <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">Privacy Policy</a>.</p>
       <button class="btn btn-primary w-100 rounded-pill py-2 mt-2" type="submit">Create account</button>
     </form>
     <p class="text-center mt-3 mb-0 small">Already in? <a href="{% url 'accounts:login' %}">Log in</a></p>

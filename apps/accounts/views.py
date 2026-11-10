@@ -3,13 +3,16 @@ from django.contrib.auth import login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, UpdateView
 
-from .forms import LoginForm, ProfileForm, SignupForm
+from . import services
+from .forms import DeleteAccountForm, LoginForm, ProfileForm, SignupForm
 from .models import User
 
 
@@ -86,3 +89,20 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "Profile updated.")
         return super().form_valid(form)
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST"])
+def delete_account(request):
+    form = DeleteAccountForm(request.user, request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            services.delete_account(request.user)
+        except services.DeletionError as exc:
+            messages.info(request, str(exc))
+            return redirect("accounts:profile")
+        auth_logout(request)
+        # Same interstitial as logout, so saved passes are cleared from this device too.
+        return render(request, "accounts/logged_out.html", {"next_url": reverse("events:feed")})
+    return render(request, "accounts/delete.html", {"form": form})

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Privacy · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<article class="legal">
+  <h1 class="display-title display-title--sm">Privacy policy</h1>
+  <p class="updated">Last updated {{ updated }}. Data controller: {{ LEGAL_ENTITY_NAME }}. Contact: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>.</p>
+
+  <h2>What we collect and why</h2>
+  <ul>
+    <li><strong>Account:</strong> username, email, password (stored only as a hash), and optional display name, neighbourhood or campus, short bio and vibe tags. Used to run your account and to show a profile to other members.</li>
+    <li><strong>Events you host:</strong> the title, description, time, area, and the exact address. The area is public. The exact address is shown only to you and to guests you have confirmed.</li>
+    <li><strong>RSVPs and check-ins:</strong> which events you asked to join, the status, any note you wrote to the host, whether you confirmed a minimum age, and when you were checked in. Hosts see this for their own events.</li>
+    <li><strong>Trust score:</strong> a number worked out from your attendance, no-shows, and events you hosted or cancelled. It is shown on your public profile.</li>
+    <li><strong>Payments:</strong> when a host pays the listing fee we keep the order and payment reference, amount and status. Card, UPI and bank details go to our payment provider (Razorpay) and never reach our servers.</li>
+    <li><strong>Reports and blocks:</strong> if you report or block someone, we store that, who it concerned, and what you wrote, so we can review it.</li>
+    <li><strong>Technical:</strong> a session cookie and a security (CSRF) cookie, your theme choice stored in your browser, and tickets saved in your browser cache so they work offline. If error monitoring is on, a crash report with the page address and error details, without your name or email.</li>
+  </ul>
+
+  <h2>Who else sees it</h2>
+  <ul>
+    <li>Other members see your public profile and, for events you attend, your name to the host.</li>
+    <li>Our service providers process data for us: hosting, email delivery, payment processing (Razorpay) and error monitoring. They may use it only to provide that service.</li>
+    <li>We do not sell your data and we do not run advertising.</li>
+    <li>We disclose data if the law requires it or to protect someone from serious harm.</li>
+  </ul>
+
+  <h2>How long we keep it</h2>
+  <p>Account data stays until you delete your account. Payment records are kept for as long as tax and accounting rules require, which can be several years, but are detached from your name when you delete your account. Reports are kept while needed to protect other members.</p>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li><strong>Edit</strong> your profile at any time from <a href="{% url 'accounts:profile_edit' %}">your profile</a>.</li>
+    <li><strong>Delete your account</strong> from your profile. We cancel your upcoming RSVPs and events, remove your name, email, bio and tags, and sign you out everywhere.</li>
+    <li><strong>Ask</strong> for a copy of your data, a correction, or to withdraw consent by emailing <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>. We reply within 30 days.</li>
+    <li>You can complain to us first. If we do not resolve it, you may complain to the Data Protection Board of India under the Digital Personal Data Protection Act, 2023.</li>
+  </ul>
+
+  <h2>Security</h2>
+  <p>Connections use HTTPS, passwords are hashed, QR passes are signed and stop working when a booking is cancelled, and addresses are released only to confirmed guests. No system is perfectly secure. If a breach affects you we will tell you and the authorities as the law requires.</p>
+
+  <h2>Children</h2>
+  <p>Partly is for people aged 18 and over. We delete accounts we learn belong to someone younger.</p>
+
+  <h2>Changes</h2>
+  <p>If we change this policy in a way that matters, we will say so on the site and update the date above.</p>
+</article>
+{% endblock %}

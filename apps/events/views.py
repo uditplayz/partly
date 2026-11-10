@@ -28,7 +28,7 @@ class FeedView(TemplateView):
     def get_context_data(self, **kwargs):
         now = timezone.now()
         filters = FeedFilterForm(self.request.GET or None)
-        qs = filters.apply(Event.objects.for_feed(now), now)
+        qs = filters.apply(Event.objects.for_feed(now).visible_to(self.request.user), now)
         events, next_cursor = paginate(qs, self.request.GET.get("cursor"))
 
         params = self.request.GET.copy()

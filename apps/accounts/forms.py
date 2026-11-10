@@ -18,6 +18,11 @@ class SignupForm(UserCreationForm):
             "campus_tag": forms.TextInput(attrs={"placeholder": "COEP / Viman Nagar"}),
         }
 
+    accept_terms = forms.BooleanField(
+        label="I'm 18 or older and I agree to the Terms and Privacy Policy",
+        error_messages={"required": "You need to confirm this to create an account."},
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
@@ -55,3 +60,19 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = ("display_name", "campus_tag", "bio", "vibe_tags")
         widgets = {"bio": forms.Textarea(attrs={"rows": 3, "maxlength": 280})}
+
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(
+        label="Your password", strip=False, widget=forms.PasswordInput(attrs={"autocomplete": "current-password"})
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not self.user.check_password(password):
+            raise forms.ValidationError("That isn't your password.")
+        return password

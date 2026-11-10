@@ -12,6 +12,7 @@ MAX_INVITES_PER_SUBMIT = 20
 class RSVPForm(forms.Form):
     plus_ones = forms.IntegerField(min_value=0, max_value=MAX_PLUS_ONES, required=False)
     note = forms.CharField(max_length=200, required=False, strip=True)
+    age_confirmed = forms.BooleanField(required=False)
 
     def clean_plus_ones(self):
         return self.cleaned_data.get("plus_ones") or 0

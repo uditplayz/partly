@@ -23,6 +23,16 @@
     {% endif %}
   </section>
 
+  {% if user.is_authenticated and not is_own_profile %}
+    <section class="p-card settings-list">
+      <a class="settings-list__row" href="{% url 'safety:report' 'user' profile_user.username %}">Report {{ profile_user.name }} <span aria-hidden="true">›</span></a>
+      <form method="post" action="{% url 'safety:block' profile_user.username %}" class="settings-list__row" data-confirm="Block {{ profile_user.name }}? You will both be removed from each other's upcoming events.">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link p-0 text-reset text-decoration-none">Block {{ profile_user.name }}</button>
+      </form>
+    </section>
+  {% endif %}
+
   {% if is_own_profile %}
     <section class="p-card settings-list">
       <a class="settings-list__row" href="{% url 'accounts:profile_edit' %}">Edit profile <span aria-hidden="true">›</span></a>
@@ -34,6 +44,8 @@
           <button type="button" role="radio" data-theme-value="dark">Dark</button>
         </div>
       </div>
+      <a class="settings-list__row" href="{% url 'safety:blocked' %}">Blocked members <span aria-hidden="true">›</span></a>
+      <a class="settings-list__row" href="{% url 'accounts:delete' %}">Delete my account <span aria-hidden="true">›</span></a>
       <form method="post" action="{% url 'accounts:logout' %}" class="settings-list__row">
         {% csrf_token %}
         <button type="submit" class="btn btn-link p-0 text-reset text-decoration-none">Log out</button>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.payments",
     "apps.rsvps",
     "apps.notifications",
+    "apps.safety",
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,10 @@ CSP_REPORT_ONLY = env.bool("CSP_REPORT_ONLY", default=False)
 SITE_NAME = "Partly"
 SITE_URL = env("SITE_URL", default="http://localhost:8000")  # used for links in emails
 PLATFORM_LISTING_FEE_INR = env("PLATFORM_LISTING_FEE_INR")
+# Shown on the legal pages and in the footer. Set these to the real operator before launch.
+LEGAL_ENTITY_NAME = env("LEGAL_ENTITY_NAME", default="Partly")
+SUPPORT_EMAIL = env("SUPPORT_EMAIL", default="support@partly.local")
+LEGAL_LAST_UPDATED = env("LEGAL_LAST_UPDATED", default="10 November 2026")
 
 # --- Payments (listing fee) -------------------------------------------------
 PAYMENT_PROVIDER = env("PAYMENT_PROVIDER", default="mock")  # "mock" or "razorpay"

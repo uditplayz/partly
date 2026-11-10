@@ -7,3 +7,4 @@ redis>=8.1,<9
 django-celery-beat>=2.9,<3
 segno>=1.6,<2
 gunicorn>=27,<28
+sentry-sdk>=2.20,<3

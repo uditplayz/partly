@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Report · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ back }}">‹ Back</a>
+  <section class="page-head">
+    <h1 class="display-title display-title--sm">Report {{ label }}</h1>
+    <p class="text-secondary">Staff read every report. The person you report is not told who you are.</p>
+  </section>
+  <form method="post" class="p-card" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_field.html" with field=form.reason %}
+    {% include "partials/form_field.html" with field=form.details %}
+    <button class="btn btn-primary rounded-pill px-4" type="submit">Send report</button>
+    <p class="form-text mt-3 mb-0">If someone is in danger right now, call 112.</p>
+  </form>
+{% endblock %}

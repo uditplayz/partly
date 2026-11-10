@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Delete account · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{% url 'accounts:profile' %}">‹ Profile</a>
+  <section class="page-head">
+    <h1 class="display-title display-title--sm">Delete my account</h1>
+    <p class="text-secondary">This can't be undone.</p>
+  </section>
+  <section class="p-card">
+    <ul>
+      <li>Your name, email, bio, tags and notes are removed, and you're signed out everywhere.</li>
+      <li>Your upcoming RSVPs are cancelled, so others can take your spots.</li>
+      <li>Events you host that are live get cancelled and the guests are emailed. Drafts are deleted.</li>
+      <li>Payment records stay for accounting, without your name. Past events stay, listed under "Deleted user".</li>
+    </ul>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for error in form.non_field_errors %}<div class="notice">{{ error }}</div>{% endfor %}
+      {% include "partials/form_field.html" with field=form.password %}
+      <button class="btn btn-primary rounded-pill px-4" type="submit">Delete my account for good</button>
+    </form>
+  </section>
+{% endblock %}

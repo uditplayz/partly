@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Terms · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<article class="legal">
+  <h1 class="display-title display-title--sm">Terms of use</h1>
+  <p class="updated">Last updated {{ updated }}. Operated by {{ LEGAL_ENTITY_NAME }}. Contact: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>.</p>
+
+  <h2>What Partly is</h2>
+  <p>Partly is a place where people list small local get-togethers (hosts) and ask to join them (guests). We provide the listing, RSVP and check-in tools. We do not organise, run, supervise or insure any event, and we are not a party to what happens between a host and a guest.</p>
+
+  <h2>Who can use it</h2>
+  <ul>
+    <li>You must be at least 18 to create an account.</li>
+    <li>Some events set a minimum age of 18 or 21. By ticking the box when you RSVP, you confirm you meet it. Giving a false confirmation is a breach of these terms.</li>
+    <li>Keep your login private. You are responsible for what happens under your account.</li>
+  </ul>
+
+  <h2>Hosts</h2>
+  <ul>
+    <li>You are responsible for your event: that it is lawful, that you may use the venue, that you have any permission or licence it needs (including for alcohol and music), and that guests are reasonably safe.</li>
+    <li>Describe the event honestly. Do not list events that are illegal, hateful, sexually explicit, or meant to deceive or exploit people.</li>
+    <li>Only share an address with the guests you confirm. Guests receive it for attending that event only.</li>
+    <li>Publishing an event costs a one-time listing fee of ₹{{ fee }}. See the <a href="{% url 'core:refunds' %}">refund policy</a>.</li>
+    <li>Any entry fee shown on an event is collected by you at the venue. Partly does not take or hold it.</li>
+  </ul>
+
+  <h2>Guests</h2>
+  <ul>
+    <li>You attend at your own risk. Use your own judgement about whether an event feels safe, and tell someone where you are going.</li>
+    <li>Keep the address and your QR pass to yourself. Do not share or sell them.</li>
+    <li>If you cannot come, cancel your RSVP so someone on the waitlist can take your place. Repeated no-shows lower your trust score.</li>
+  </ul>
+
+  <h2>Behaviour</h2>
+  <p>Do not harass, threaten, impersonate, scam, or discriminate against anyone. Do not scrape the service, probe it for weaknesses, or use it to send spam. You can report an event or a person from their page, and you can block someone from yours.</p>
+
+  <h2>What we may do</h2>
+  <p>We may remove events, suspend accounts or refuse service when we believe these terms were broken or someone could be harmed, with or without notice. If we remove a published event, we cancel it and tell its guests.</p>
+
+  <h2>Emergencies</h2>
+  <p>Partly cannot respond to emergencies. If someone is in danger, call 112.</p>
+
+  <h2>Liability</h2>
+  <p>The service is provided as it is. To the extent the law allows, {{ LEGAL_ENTITY_NAME }} is not liable for events, for what hosts or guests do, or for losses that follow from using Partly, and our total liability to you is limited to the listing fees you paid us in the 12 months before the claim. Nothing here limits liability that cannot be limited by law.</p>
+
+  <h2>Changes and disputes</h2>
+  <p>We may update these terms. If a change is significant we will say so on the site. These terms are governed by the laws of India. Courts at the place where {{ LEGAL_ENTITY_NAME }} is based have jurisdiction, subject to any consumer rights you have by law.</p>
+
+  <h2>Questions and complaints</h2>
+  <p>Write to <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>. We aim to reply within 7 days.</p>
+</article>
+{% endblock %}

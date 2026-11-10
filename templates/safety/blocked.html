@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Blocked members · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{% url 'accounts:profile' %}">‹ Profile</a>
+  <section class="page-head">
+    <h1 class="display-title display-title--sm">Blocked members</h1>
+    <p class="text-secondary">Blocked people can't join your events, you can't join theirs, and their events stay out of your feed.</p>
+  </section>
+  {% if rows %}
+    <div class="host-list">
+      {% for row in rows %}
+        <div class="guest-row">
+          <span class="avatar" aria-hidden="true">{{ row.blocked.initials }}</span>
+          <div class="guest-row__main"><strong>{{ row.blocked.name }}</strong><span class="text-secondary">@{{ row.blocked.username }}</span></div>
+          <div class="guest-row__actions">
+            <form method="post" action="{% url 'safety:unblock' row.blocked.username %}">{% csrf_token %}<button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="submit">Unblock</button></form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-secondary">You haven't blocked anyone. You can block someone from their profile.</p>
+  {% endif %}
+{% endblock %}

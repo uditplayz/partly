@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Refunds · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<article class="legal">
+  <h1 class="display-title display-title--sm">Refund policy</h1>
+  <p class="updated">Last updated {{ updated }}. Contact: <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>.</p>
+
+  <h2>What you pay for</h2>
+  <p>The only thing Partly charges is a one-time listing fee of ₹{{ fee }} per event, paid by the host to publish it. Guests pay Partly nothing. Any entry fee on an event is paid to the host at the venue and is between you and the host.</p>
+
+  <h2>When we refund the listing fee</h2>
+  <ul>
+    <li><strong>The payment went through but your event was not published.</strong> We refund the full fee.</li>
+    <li><strong>You were charged more than once for the same event.</strong> We refund the extra charges.</li>
+    <li><strong>We remove your event for a reason that is not your fault</strong>, such as a fault on our side. We refund the fee.</li>
+  </ul>
+
+  <h2>When we do not</h2>
+  <ul>
+    <li>You cancel your event, change your mind, or too few people RSVP. The fee pays for publishing, which already happened.</li>
+    <li>We remove an event or suspend an account because it broke the <a href="{% url 'core:terms' %}">terms</a>.</li>
+  </ul>
+
+  <h2>How to ask</h2>
+  <p>Email <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a> with the event name and the payment reference shown on your payment page. We check each request and reply within 7 days. Refunds go back to the original payment method through our payment provider and normally reach you in 5 to 7 working days after we approve them, depending on your bank.</p>
+</article>
+{% endblock %}

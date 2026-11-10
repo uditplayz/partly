@@ -39,6 +39,9 @@
             </select>
           </div>
         {% endif %}
+        {% if event.min_age %}
+        <label class="toggle-row" for="inv-age"><span>I'm {{ event.min_age }} or over</span><input type="checkbox" name="age_confirmed" id="inv-age" class="toggle" required></label>
+        {% endif %}
         <button type="submit" name="action" value="accept" class="btn btn-accent rounded-pill py-2">Accept invite</button>
         {% if invitation.status == 'SENT' %}
           <button type="submit" name="action" value="decline" class="btn btn-outline-primary rounded-pill py-2">Can't make it</button>

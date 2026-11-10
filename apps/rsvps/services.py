@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.events.models import Event
 
 from apps.notifications import dispatch, tasks
+from apps.safety.models import Block
 
 from .models import RSVP, Invitation
 
@@ -71,7 +72,7 @@ def promote_waitlist(event_id):
 
 
 @transaction.atomic
-def request_rsvp(user, event, plus_ones=0, note="", invitation=None):
+def request_rsvp(user, event, plus_ones=0, note="", invitation=None, age_confirmed=False):
     """Create or re-open the user's RSVP. An invitation skips host approval, never capacity."""
     event = _lock_event(event.pk)
     now = timezone.now()
@@ -81,6 +82,10 @@ def request_rsvp(user, event, plus_ones=0, note="", invitation=None):
         raise RSVPError("RSVPs have closed for this event.")
     if user.pk == event.host_id:
         raise RSVPError("You're hosting this one.")
+    if Block.exists_between(user, event.host):
+        raise RSVPError("You can't join this event.")
+    if event.min_age and not age_confirmed:
+        raise RSVPError(f"Please confirm you are {event.min_age} or over to join this one.")
     if not 0 <= plus_ones <= event.max_plus_ones:
         raise RSVPError(
             "This event doesn't allow plus-ones." if event.max_plus_ones == 0
@@ -228,7 +233,7 @@ def check_invitee(invitation, user):
 
 
 @transaction.atomic
-def accept_invitation(token, user, plus_ones=0):
+def accept_invitation(token, user, plus_ones=0, age_confirmed=False):
     invitation = Invitation.objects.select_for_update().get(invite_token=token)
     check_invitee(invitation, user)
     existing = RSVP.objects.filter(event_id=invitation.event_id, user=user,
@@ -236,7 +241,8 @@ def accept_invitation(token, user, plus_ones=0):
     if existing is None:
         if invitation.status == Invitation.Status.ACCEPTED:
             raise RSVPError("This invite has already been used.")
-        existing = request_rsvp(user, invitation.event, plus_ones=plus_ones, invitation=invitation)
+        existing = request_rsvp(user, invitation.event, plus_ones=plus_ones, invitation=invitation,
+                               age_confirmed=age_confirmed)
     invitation.status = Invitation.Status.ACCEPTED
     invitation.responded_at = timezone.now()
     invitation.invitee_user = user

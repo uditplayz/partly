@@ -28,6 +28,7 @@ class PlatformPayment(models.Model):
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.CREATED)
     # Money arrived but the event could not be published with it. A person must refund it.
     needs_refund = models.BooleanField(default=False)
+    refunded_at = models.DateTimeField(null=True, blank=True, help_text="Set when staff refunded it in the provider dashboard")
     failure_reason = models.CharField(max_length=200, blank=True)
     raw_payload = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
