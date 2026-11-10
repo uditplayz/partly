@@ -56,6 +56,9 @@ class Command(BaseCommand):
             raise CommandError("Refusing to seed demo data with DEBUG=False (pass --force to override).")
 
         if reset:
+            # Payment records protect their user, so clear the demo hosts' sandbox payments first.
+            from apps.payments.models import PlatformPayment
+            PlatformPayment.objects.filter(user__username__startswith=DEMO_PREFIX).delete()
             deleted, _ = Event.objects.filter(host__username__startswith=DEMO_PREFIX).delete()
             User.objects.filter(username__startswith=DEMO_PREFIX).delete()
             self.stdout.write(f"Removed {deleted} demo events and their hosts.")

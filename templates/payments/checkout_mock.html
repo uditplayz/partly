@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Pay listing fee · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ event.get_absolute_url }}">‹ Back to draft</a>
+
+  <section class="p-card pay-card">
+    <p class="sandbox-note">Sandbox checkout. No real money moves.</p>
+    <p class="eyebrow">Listing fee</p>
+    <p class="pay-card__amount">₹{{ payment.amount_display }}</p>
+    <p class="text-secondary">One-time fee to publish <strong>{{ event.title }}</strong> on the feed.</p>
+
+    <div class="pay-card__qr" aria-label="UPI QR code">{{ upi_qr_svg|safe }}</div>
+    <p class="pay-card__upi">UPI ID <strong>{{ upi_id }}</strong></p>
+    <p class="pay-card__order">Order {{ payment.provider_order_id }}</p>
+
+    <form method="post" action="{% url 'payments:mock_pay' payment.provider_order_id %}" class="d-grid gap-2">
+      {% csrf_token %}
+      <button type="submit" name="outcome" value="success" class="btn btn-primary rounded-pill py-2">Pay ₹{{ payment.amount_display }}</button>
+      <button type="submit" name="outcome" value="fail" class="btn btn-outline-primary rounded-pill py-2">Simulate a failed payment</button>
+    </form>
+  </section>
+{% endblock %}

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.events",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [
@@ -123,6 +124,14 @@ CELERY_TIMEZONE = TIME_ZONE
 # --- App --------------------------------------------------------------------
 SITE_NAME = "Partly"
 PLATFORM_LISTING_FEE_INR = env("PLATFORM_LISTING_FEE_INR")
+
+# --- Payments (listing fee) -------------------------------------------------
+PAYMENT_PROVIDER = env("PAYMENT_PROVIDER", default="mock")  # "mock" or "razorpay"
+PAYMENT_ORDER_TTL_MINUTES = env.int("PAYMENT_ORDER_TTL_MINUTES", default=30)
+MOCK_WEBHOOK_SECRET = env("MOCK_WEBHOOK_SECRET", default=SECRET_KEY)
+RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID", default="")
+RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET", default="")
+RAZORPAY_WEBHOOK_SECRET = env("RAZORPAY_WEBHOOK_SECRET", default="")
 PWA_CACHE_VERSION = env("PWA_CACHE_VERSION")
 PWA_THEME_COLOR_LIGHT = "#FAF7F2"
 PWA_THEME_COLOR_DARK = "#1C1A17"

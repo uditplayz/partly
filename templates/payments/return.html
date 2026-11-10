@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Payment status · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <section class="p-card empty-state mt-3" data-status-url="{% url 'payments:status' payment.provider_order_id %}" data-status="{{ payment.status }}">
+    {% if payment.status == 'CAPTURED' %}
+      <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1 class="h4">You're live</h1>
+      <p class="text-secondary mb-3">Payment received. <strong>{{ payment.event.title }}</strong> is now on the feed.</p>
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a class="btn btn-primary rounded-pill px-4" href="{{ payment.event.get_absolute_url }}">View event</a>
+        <a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'events:my_hosting' %}">My hosting</a>
+      </div>
+    {% elif payment.status == 'CREATED' %}
+      <div class="empty-state__art" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1 class="h4">Waiting for your payment</h1>
+      <p class="text-secondary mb-3">This page updates by itself once the payment is confirmed. It usually takes a few seconds.</p>
+      <a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'payments:checkout' payment.provider_order_id %}">Back to checkout</a>
+    {% else %}
+      <div class="empty-state__art empty-state__art--offline" aria-hidden="true"><span></span><span></span><span></span></div>
+      {% if payment.needs_refund %}
+        <h1 class="h4">We received a payment we couldn't use</h1>
+        <p class="text-secondary mb-3">Your event was not published with it. We've flagged order {{ payment.provider_order_id }} for a refund.</p>
+      {% elif payment.status == 'EXPIRED' %}
+        <h1 class="h4">This checkout expired</h1>
+        <p class="text-secondary mb-3">Nothing was charged. Start again when you're ready.</p>
+      {% else %}
+        <h1 class="h4">The payment didn't go through</h1>
+        <p class="text-secondary mb-3">{{ payment.failure_reason|default:"Nothing was charged." }} Your draft is safe.</p>
+      {% endif %}
+      {% if payment.event and payment.event.status == 'DRAFT' %}
+        <form method="post" action="{% url 'payments:start' payment.event.slug %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary rounded-pill px-4">Try again</button>
+        </form>
+      {% elif payment.event %}
+        <a class="btn btn-outline-primary rounded-pill px-4" href="{{ payment.event.get_absolute_url }}">View event</a>
+      {% endif %}
+    {% endif %}
+  </section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/pay-status.js' %}" defer></script>{% endblock %}

@@ -56,6 +56,13 @@ def test_seed_demo(settings):
     call_command("seed_demo")  # second run without --reset is a no-op
     assert Event.objects.count() == 40
 
+    # A demo host with a sandbox payment must not block --reset.
+    from apps.payments import services as payment_services
+    host = User.objects.get(username="demo_aditi")
+    draft = Event.objects.filter(host=host).first()
+    Event.objects.filter(pk=draft.pk).update(status="DRAFT", platform_fee_status="PENDING")
+    assert payment_services.start_checkout(draft, host) is not None
+
     call_command("seed_demo", "--reset")
     assert Event.objects.count() == 40
 

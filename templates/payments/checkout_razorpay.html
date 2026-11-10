@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Pay listing fee · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{{ event.get_absolute_url }}">‹ Back to draft</a>
+
+  <section class="p-card pay-card">
+    <p class="eyebrow">Listing fee</p>
+    <p class="pay-card__amount">₹{{ payment.amount_display }}</p>
+    <p class="text-secondary">One-time fee to publish <strong>{{ event.title }}</strong> on the feed. Pay by UPI, card or netbanking.</p>
+    <button type="button" class="btn btn-primary rounded-pill py-2 w-100" id="rzp-pay">Pay ₹{{ payment.amount_display }}</button>
+    <p class="form-text mt-3 mb-0">Payments are handled by Razorpay. Your event goes live once they confirm the payment.</p>
+  </section>
+
+  {{ razorpay_options|json_script:"rzp-options" }}
+{% endblock %}
+{% block extra_js %}
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    (function () {
+      var options = JSON.parse(document.getElementById("rzp-options").textContent);
+      var returnUrl = "{{ return_url|escapejs }}";
+      // The return page only shows status. Publishing happens when Razorpay's webhook arrives.
+      options.handler = function () { window.location.href = returnUrl; };
+      document.getElementById("rzp-pay").addEventListener("click", function () {
+        var checkout = new Razorpay(options);
+        checkout.on("payment.failed", function () { window.location.href = returnUrl; });
+        checkout.open();
+      });
+    })();
+  </script>
+{% endblock %}

@@ -51,10 +51,16 @@
   {% if is_host %}
     <section class="p-card host-actions">
       {% if event.status == 'DRAFT' %}
-        <p class="mb-3">This is a draft, so only you can see it. Publishing with the ₹{{ PLATFORM_FEE }} listing fee arrives in the next update.</p>
+        <p class="mb-3">This is a draft, so only you can see it. Publishing puts it on the feed{% if PLATFORM_FEE %} for a one-time ₹{{ PLATFORM_FEE }} listing fee{% endif %}.</p>
       {% endif %}
       <div class="d-flex gap-2 flex-wrap">
-        {% if event.is_editable %}<a class="btn btn-primary rounded-pill px-4" href="{% url 'events:edit' event.slug %}">Edit</a>{% endif %}
+        {% if event.status == 'DRAFT' %}
+          <form method="post" action="{% url 'payments:start' event.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-accent rounded-pill px-4">Publish{% if PLATFORM_FEE %} · ₹{{ PLATFORM_FEE }}{% endif %}</button>
+          </form>
+        {% endif %}
+        {% if event.is_editable %}<a class="btn btn-outline-primary rounded-pill px-4" href="{% url 'events:edit' event.slug %}">Edit</a>{% endif %}
         {% if event.status == 'DRAFT' %}
           <form method="post" action="{% url 'events:delete' event.slug %}" data-confirm="Delete this draft?">
             {% csrf_token %}

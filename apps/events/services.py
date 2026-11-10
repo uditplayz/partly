@@ -26,9 +26,19 @@ def delete_draft(event):
     event.delete()
 
 
+def publish_paid(event, payment_id):
+    """Called only by the payment webhook path, which already holds the row lock."""
+    event.platform_fee_status = Event.FeeStatus.PAID
+    event.platform_payment_id = payment_id or ""
+    event.status = Event.Status.PUBLISHED
+    event.published_at = timezone.now()
+    event.save(update_fields=["platform_fee_status", "platform_payment_id", "status", "published_at", "updated_at"])
+    return event
+
+
 @transaction.atomic
 def waive_and_publish(event):
-    """Staff-only shortcut until real checkout lands in Phase 3."""
+    """Publish without payment: the staff admin action, demo data, or a zero listing fee."""
     event = Event.objects.select_for_update().get(pk=event.pk)
     if event.status != Event.Status.DRAFT:
         return event

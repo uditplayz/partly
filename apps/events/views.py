@@ -77,7 +77,7 @@ class EventCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = services.create_draft(self.request.user, form)
-        messages.success(self.request, "Draft saved. Publishing opens up soon.")
+        messages.success(self.request, "Draft saved. Publish it when you're ready.")
         return redirect(self.object.get_absolute_url())
 
 

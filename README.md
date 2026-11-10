@@ -4,7 +4,7 @@ Find parties near you and get on the guest list.
 
 Partly is an installable web app for hosting and joining small local hangouts: house parties, rooftop jams, workshops, study sessions, chai breaks. Hosts keep their address private until they confirm a guest. Rooms never overfill. Guests get in by showing a QR pass at the door.
 
-> **Status: early development.** Phases 1 and 2 of 6 are complete: accounts, the installable app shell, offline support, event drafts and the filterable feed, all covered by tests. Payments, RSVPs and check-in are designed but not built yet. See [Roadmap](#roadmap).
+> **Status: early development.** Phases 1 to 3 of 6 are complete: accounts, the installable app shell, offline support, event drafts, the filterable feed and the listing-fee checkout, all covered by tests. The checkout runs in a sandbox; the Razorpay adapter is written but has not been run against live Razorpay yet. RSVPs and check-in are designed but not built. See [Roadmap](#roadmap).
 
 ## Why
 
@@ -24,7 +24,7 @@ Partly is built around a few rules:
 | App shell | Installable PWA, offline page, light and dark themes, mobile bottom nav | ✅ Built |
 | Feed | List of events filtered by vibe, area, date, free entry and open spots | ✅ Built |
 | Hosting | Draft and edit events, My Hosting dashboard | ✅ Built |
-| Publishing | Publish an event after paying a listing fee via UPI (sandbox, Razorpay-ready) | Phase 3 |
+| Publishing | Publish an event after paying a listing fee: sandbox UPI checkout, signed webhooks, Razorpay adapter | ✅ Built (sandbox) |
 | RSVPs | Capacity limits, optional host approval, waitlist, email invitations | Phase 4 |
 | Check-in | QR pass for each guest; the host scans it with their phone camera | Phase 5 |
 | Email | Confirmations, host alerts, reminders 24 h and 2 h before start | Phase 6 |
@@ -85,7 +85,10 @@ All settings come from environment variables, loaded from `.env`:
 | `DATABASE_URL` | `postgres://postgres@localhost:5432/partly` | PostgreSQL connection |
 | `REDIS_URL` | `redis://localhost:6379/0` | Celery broker (Phase 6) |
 | `CELERY_TASK_ALWAYS_EAGER` | `False` | Run tasks inline without Redis |
-| `PLATFORM_LISTING_FEE_INR` | `49` | Fee charged to publish an event |
+| `PLATFORM_LISTING_FEE_INR` | `49` | Fee charged to publish an event. `0` publishes without checkout |
+| `PAYMENT_PROVIDER` | `mock` | `mock` (sandbox, no real money) or `razorpay`. Production refuses `mock` unless `ALLOW_MOCK_PAYMENTS=True` |
+| `PAYMENT_ORDER_TTL_MINUTES` | `30` | How long an unpaid checkout stays open |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | empty | Needed for `razorpay`. Point a Razorpay webhook for `payment.captured` and `payment.failed` at `/payments/webhook/razorpay/` |
 | `PWA_CACHE_VERSION` | `v1` | Change this to make browsers reload cached files |
 
 ### Running tests
@@ -108,7 +111,7 @@ apps/
   core/            layout, PWA (manifest, service worker, offline page), shared constants
   accounts/        custom User model, auth, profiles
   events/          events, feed, filters, hosting dashboard, seed_demo command
-  payments/        listing-fee checkout and webhook (Phase 3)
+  payments/        listing-fee checkout, providers (mock, Razorpay) and the webhook
   rsvps/           RSVPs, invitations, QR passes, check-in (Phases 4–5)
   notifications/   Celery tasks and email (Phase 6)
 templates/         Django templates; the service worker is rendered from here
@@ -133,7 +136,7 @@ Each phase is finished only when its tests pass and it has been checked by hand.
 
 1. ✅ **Foundation and PWA shell:** accounts, design system, installable offline app
 2. ✅ **Events and feed:** drafts, filters, fast area search, demo data
-3. **Listing-fee checkout:** sandbox UPI, signed webhooks, Razorpay adapter
+3. ✅ **Listing-fee checkout:** sandbox UPI, signed webhooks, Razorpay adapter (not yet tested against live Razorpay)
 4. **RSVP engine:** capacity, approvals, waitlist, invitations, overbooking tests under concurrent requests
 5. **QR passes and scanner:** signed passes, host camera check-in, offline tickets
 6. **Email and reminders:** Celery pipeline, scheduled reminders, trust score
