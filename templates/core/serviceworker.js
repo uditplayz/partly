@@ -10,6 +10,7 @@ const USER_CACHE_PREFIX = "partly-user-";
 const OFFLINE_URL = {{ offline_url }};
 const SHELL_ASSETS = {{ shell_assets }};
 const NEVER_CACHE = {{ never_cache }};
+const TICKETS_PREFIX = "/tickets/";
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
 self.addEventListener("install", (event) => {
@@ -61,8 +62,9 @@ async function networkFirstPage(request) {
     if (isCacheable(response)) cache.put(request, response.clone());
     return response;
   } catch (err) {
-    const cached = await cache.match(request, { ignoreSearch: false });
+    const cached = await cache.match(request, { ignoreVary: true });
     if (cached) return cached;
+    if (request.mode !== "navigate") return Response.error();
     return (await caches.match(OFFLINE_URL)) || Response.error();
   }
 }
@@ -95,6 +97,12 @@ self.addEventListener("fetch", (event) => {
 
   if (url.pathname.startsWith("/static/")) {
     event.respondWith(staleWhileRevalidate(request));
+    return;
+  }
+  // Tickets and QR passes: network first, with the last copy kept in the user cache so a
+  // guest can still show their pass with no signal at the venue. Wiped on logout.
+  if (url.pathname.startsWith(TICKETS_PREFIX)) {
+    event.respondWith(networkFirstPage(request));
     return;
   }
   if (request.mode === "navigate") {

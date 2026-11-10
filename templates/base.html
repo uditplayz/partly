@@ -50,7 +50,7 @@
 
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}" defer></script>
   <script src="{% static 'js/app.js' %}" defer></script>
-  <script src="{% static 'js/sw-register.js' %}" data-sw-url="{% url 'core:serviceworker' %}" defer></script>
+  <script src="{% static 'js/sw-register.js' %}" data-sw-url="{% url 'core:serviceworker' %}"{% if user.is_authenticated %} data-warm-url="{% url 'rsvps:tickets' %}"{% endif %} defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

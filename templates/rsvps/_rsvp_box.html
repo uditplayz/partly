@@ -3,6 +3,7 @@
   {% if my_rsvp.status == 'CONFIRMED' %}
     <p class="rsvp-box__state rsvp-box__state--in">You're in{% if my_rsvp.plus_ones %} · +{{ my_rsvp.plus_ones }}{% endif %}</p>
     <p class="text-secondary">The exact address is unlocked above. Please keep it to yourself.</p>
+    <a class="btn btn-primary rounded-pill px-4" href="{% url 'rsvps:tickets' %}">Show my QR pass</a>
   {% elif my_rsvp.status == 'PENDING_APPROVAL' %}
     <p class="rsvp-box__state">Waiting for the host</p>
     <p class="text-secondary">{{ event.host.name }} approves guests for this one. The address unlocks once you're confirmed.</p>

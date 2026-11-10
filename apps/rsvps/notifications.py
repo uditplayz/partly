@@ -8,10 +8,11 @@ that was rolled back. A mail failure is logged and never breaks the request.
 import logging
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.urls import reverse
 from django.utils import timezone
 
+from . import qr
 from .models import RSVP, Invitation
 
 logger = logging.getLogger(__name__)
@@ -25,11 +26,14 @@ def _when(event):
     return timezone.localtime(event.start_time).strftime("%a %d %b, %I:%M %p")
 
 
-def _send(subject, body, to):
+def _send(subject, body, to, attachments=()):
     if not to:
         return False
     try:
-        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [to])
+        message = EmailMessage(subject, body, settings.DEFAULT_FROM_EMAIL, [to])
+        for filename, content, mimetype in attachments:
+            message.attach(filename, content, mimetype)
+        message.send()
         return True
     except Exception:  # noqa: BLE001 (mail must never break a request)
         logger.exception("Could not send %r to %s", subject, to)
@@ -52,8 +56,15 @@ def rsvp_confirmed(rsvp_id):
     ]
     if rsvp.plus_ones:
         lines.append(f"Plus-ones: {rsvp.plus_ones}")
-    lines += ["", "Please keep the address to yourself.", f"Your plans: {absolute(reverse('rsvps:tickets'))}"]
-    return _send(f"You're in: {event.title}", "\n".join(lines), rsvp.user.email)
+    lines += [
+        "",
+        "Your QR pass is attached. Show it at the door, or open it from My Tickets:",
+        absolute(reverse("rsvps:tickets")),
+        "",
+        "Please keep the address and the pass to yourself.",
+    ]
+    attachments = [("partly-pass.png", qr.png_bytes(rsvp), "image/png")]
+    return _send(f"You're in: {event.title}", "\n".join(lines), rsvp.user.email, attachments)
 
 
 def host_new_request(rsvp_id):

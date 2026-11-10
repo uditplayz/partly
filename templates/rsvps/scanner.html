@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Scanner · {{ event.title }} · {{ SITE_NAME }}{% endblock %}
+{% block content %}
+  <a class="back-link" href="{% url 'rsvps:manage' event.slug %}">‹ Guest list</a>
+
+  <section class="scanner" data-scanner
+           data-checkin-url="{% url 'rsvps:api_checkin' event.slug %}"
+           data-stats-url="{% url 'rsvps:api_checkin_stats' event.slug %}"
+           data-csrf="{{ csrf_token }}">
+    <p class="eyebrow">Door check-in</p>
+    <h1 class="display-title display-title--sm">{{ event.title }}</h1>
+
+    <div class="scanner__frame">
+      <div id="scanner-reader" class="scanner__reader"></div>
+      <div class="scanner__badge" data-badge data-tone="ok" role="status" aria-live="assertive" hidden>
+        <strong data-badge-title></strong>
+        <span data-badge-detail></span>
+      </div>
+    </div>
+
+    <p class="scanner__hint" data-scanner-hint>Tap start, then point the camera at a guest's pass.</p>
+    <button type="button" class="btn btn-accent rounded-pill w-100 py-2" data-scanner-start>Start scanning</button>
+
+    <div class="stat-row stat-row--two mt-3">
+      <div class="stat"><strong><span data-stat="checked_in">{{ stats.checked_in }}</span>/<span data-stat="confirmed">{{ stats.confirmed }}</span></strong><span>guests checked in</span></div>
+      <div class="stat"><strong><span data-stat="people_checked_in">{{ stats.people_checked_in }}</span>/<span data-stat="people_confirmed">{{ stats.people_confirmed }}</span></strong><span>people, with plus-ones</span></div>
+    </div>
+    <p class="form-text text-center mt-3 mb-0">Phone died or no pass? Check the guest in from the <a href="{% url 'rsvps:manage' event.slug %}">guest list</a>.</p>
+  </section>
+{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'vendor/html5-qrcode/html5-qrcode.min.js' %}" defer></script>
+  <script src="{% static 'js/scanner.js' %}" defer></script>
+{% endblock %}

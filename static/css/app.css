@@ -311,3 +311,25 @@ a.settings-list__row:hover { background: var(--p-surface-2); color: inherit; }
 .invite-list { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
 .invite-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: .92rem; word-break: break-all; }
 .plan-card .event-card__title a { color: inherit; text-decoration: none; }
+
+/* ---------------------------------------------------------------- Phase 5: passes + scanner */
+.pass-modal .modal-content { background: var(--p-surface); border: 1px solid var(--p-line); border-radius: var(--p-radius-lg); }
+.pass-modal .modal-body { text-align: center; padding: 28px 22px; position: relative; }
+.pass-modal__close { position: absolute; top: 14px; right: 14px; }
+.pass-modal__qr { display: inline-block; background: #fff; padding: 8px; border-radius: var(--p-radius); border: 1px solid var(--p-line); margin: 10px 0; }
+.pass-modal__qr svg { display: block; width: min(72vw, 300px); height: auto; }
+.pass-modal__name { font-family: var(--p-font-display); font-weight: 700; font-size: 1.3rem; margin-bottom: 4px; }
+.pass-modal__name span { color: var(--p-sage-strong); }
+.scanner { max-width: 480px; margin-inline: auto; }
+.scanner__frame { position: relative; background: var(--p-ink); border-radius: var(--p-radius-lg); overflow: hidden; min-height: 240px; margin-bottom: 12px; }
+[data-bs-theme="dark"] .scanner__frame { background: #000; }
+.scanner__reader video { display: block; width: 100% !important; border-radius: 0; }
+.scanner__hint { color: var(--p-muted); text-align: center; margin-bottom: 12px; }
+.scanner__badge { position: absolute; inset: 0; display: grid; place-content: center; gap: 6px; text-align: center; padding: 20px; color: #fff; }
+.scanner__badge[hidden] { display: none; }
+.scanner__badge strong { font-family: var(--p-font-display); font-size: 2rem; line-height: 1.1; }
+.scanner__badge span { font-size: 1.15rem; font-weight: 700; }
+.scanner__badge[data-tone="ok"] { background: #3F6B50; }
+.scanner__badge[data-tone="warn"] { background: #A9781F; }
+.scanner__badge[data-tone="bad"] { background: #8A4A31; }
+.stat-row--two { grid-template-columns: 1fr 1fr; }

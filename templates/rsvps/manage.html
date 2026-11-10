@@ -16,6 +16,10 @@
     <div class="stat"><strong>{{ checked_in_count }}</strong><span>checked in</span></div>
   </div>
 
+  {% if can_scan %}
+    <a class="btn btn-accent rounded-pill w-100 py-2 mt-2" href="{% url 'rsvps:scanner' event.slug %}">Open door scanner</a>
+  {% endif %}
+
   {% if pending %}
     <h2 class="section-title">Waiting for your call</h2>
     <div class="host-list">
@@ -48,6 +52,7 @@
           </div>
           {% if not rsvp.checked_in %}
             <div class="guest-row__actions">
+              <form method="post" action="{% url 'rsvps:manual_checkin' rsvp.pk %}">{% csrf_token %}<button class="btn btn-primary btn-sm rounded-pill px-3" type="submit">Check in</button></form>
               <form method="post" action="{% url 'rsvps:decline' rsvp.pk %}" data-confirm="Remove {{ rsvp.user.name }} from the guest list?">{% csrf_token %}<button class="btn btn-outline-primary btn-sm rounded-pill px-3" type="submit">Remove</button></form>
             </div>
           {% endif %}
