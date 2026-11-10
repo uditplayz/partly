@@ -1,0 +1,10 @@
+{% autoescape off %}{{ greeting }}
+{% for line in lines %}
+{{ line }}{% endfor %}
+{% if button %}
+{{ button.label }}: {{ button.url }}
+{% endif %}{% if footer %}
+{{ footer }}
+{% endif %}
+-- Partly
+{% endautoescape %}

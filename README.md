@@ -4,7 +4,7 @@ Find parties near you and get on the guest list.
 
 Partly is an installable web app for hosting and joining small local hangouts: house parties, rooftop jams, workshops, study sessions, chai breaks. Hosts keep their address private until they confirm a guest. Rooms never overfill. Guests get in by showing a QR pass at the door.
 
-> **Status: early development.** Phases 1 to 5 of 6 are complete: accounts, the installable app shell, offline support, event drafts, the filterable feed, the listing-fee checkout, RSVPs with approvals, a waitlist and invitations, and QR passes with a door check-in scanner, all covered by tests. The checkout runs in a sandbox; the Razorpay adapter is written but has not been run against live Razorpay yet. The camera scanner has not yet been tried on a real phone, and offline pass display has not been checked in a browser. The background email pipeline is designed but not built; emails are sent directly for now. See [Roadmap](#roadmap).
+> **Status: early development.** All 6 phases are built: accounts, the installable app shell, offline support, event drafts, the filterable feed, the listing-fee checkout, RSVPs with approvals, a waitlist and invitations, QR passes with a door check-in scanner, and a Celery email pipeline with scheduled reminders and trust scores, all covered by tests. The checkout runs in a sandbox; the Razorpay adapter is written but has not been run against live Razorpay yet. The camera scanner has not yet been tried on a real phone, and offline pass display has not been checked in a browser. The Celery worker and beat have been run once against Redis 7 on Windows; tests run tasks inline. See [Roadmap](#roadmap).
 
 ## Why
 
@@ -27,13 +27,14 @@ Partly is built around a few rules:
 | Publishing | Publish an event after paying a listing fee: sandbox UPI checkout, signed webhooks, Razorpay adapter | ✅ Built (sandbox) |
 | RSVPs | Capacity limits, optional host approval, waitlist, email invitations, My Tickets, guest manager for hosts | ✅ Built |
 | Check-in | Signed QR pass for each guest; the host scans it with a phone camera, with a manual fallback and live counts | ✅ Built (camera untested on device) |
-| Email | Confirmations, host alerts, reminders 24 h and 2 h before start | Phase 6 |
+| Email | Confirmations with the QR pass, host alerts, invitations, cancellation notices, reminders 24 h and 2 h before start (HTML and plain text, sent by Celery) | ✅ Built |
+| Trust | Stored score from attendance, hosting and host cancellations, recomputed after each event and nightly | ✅ Built |
 
 ## Tech stack
 
 - **Backend:** Python, Django 5.2 LTS, PostgreSQL
 - **Frontend:** Django templates, Bootstrap 5 (restyled with CSS variables), vanilla JavaScript
-- **Background jobs:** Celery, Redis, django-celery-beat (Phase 6)
+- **Background jobs:** Celery, Redis, django-celery-beat
 - **QR:** segno (generating passes), html5-qrcode (camera scanning)
 - **PWA:** web manifest, a service worker served from `/`, offline fallback page
 
@@ -43,7 +44,7 @@ Partly is built around a few rules:
 
 - Python 3.13 or 3.14
 - PostgreSQL 14 or newer (developed on 18)
-- Redis, from Phase 6 onwards. On Windows, use [Memurai](https://www.memurai.com/) or Redis in WSL.
+- Redis, only if you run a real worker. Development runs tasks inline without it. The quickest route is Docker: `docker run -d --name partly-redis -p 6379:6379 redis:7-alpine`.
 
 ### Setup
 
@@ -84,13 +85,25 @@ All settings come from environment variables, loaded from `.env`:
 | `SITE_URL` | `http://localhost:8000` | Base URL used for links in emails |
 | `CSRF_TRUSTED_ORIGINS` | empty | Add your tunnel URL when testing on a phone |
 | `DATABASE_URL` | `postgres://postgres@localhost:5432/partly` | PostgreSQL connection |
-| `REDIS_URL` | `redis://localhost:6379/0` | Celery broker (Phase 6) |
-| `CELERY_TASK_ALWAYS_EAGER` | `False` | Run tasks inline without Redis |
+| `REDIS_URL` | `redis://localhost:6379/0` | Celery broker. Required in production (no fallback) |
+| `CELERY_TASK_ALWAYS_EAGER` | `True` in dev, `False` elsewhere | Run tasks inline without Redis. Forced off in production |
+| `EMAIL_BACKEND`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` | console backend in dev, SMTP in production | Where email goes |
 | `PLATFORM_LISTING_FEE_INR` | `49` | Fee charged to publish an event. `0` publishes without checkout |
 | `PAYMENT_PROVIDER` | `mock` | `mock` (sandbox, no real money) or `razorpay`. Production refuses `mock` unless `ALLOW_MOCK_PAYMENTS=True` |
 | `PAYMENT_ORDER_TTL_MINUTES` | `30` | How long an unpaid checkout stays open |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | empty | Needed for `razorpay`. Point a Razorpay webhook for `payment.captured` and `payment.failed` at `/payments/webhook/razorpay/` |
 | `PWA_CACHE_VERSION` | `v1` | Change this to make browsers reload cached files |
+
+### Background jobs
+
+With `CELERY_TASK_ALWAYS_EAGER=False` and a reachable `REDIS_URL`, run a worker and the scheduler as two processes:
+
+```bash
+celery -A config worker -l info --pool=solo   # --pool=solo is needed on Windows
+celery -A config beat -l info
+```
+
+`migrate` installs four periodic jobs (reminders and event completion every 15 minutes, payment-order expiry every 10, trust scores nightly at 03:30 IST). They live in the database, so you can pause or retime them in the Django admin.
 
 ### Running tests
 
@@ -114,7 +127,7 @@ apps/
   events/          events, feed, filters, hosting dashboard, seed_demo command
   payments/        listing-fee checkout, providers (mock, Razorpay) and the webhook
   rsvps/           RSVPs, waitlist, invitations, My Tickets, guest manager (QR passes, door scanner, check-in)
-  notifications/   Celery tasks and email (Phase 6)
+  notifications/   Celery tasks, email builders, beat schedule
 templates/         Django templates; the service worker is rendered from here
 static/            CSS design tokens, JavaScript, icons, vendored Bootstrap
 ```
@@ -130,6 +143,8 @@ The rules that keep Partly safe live in the database and in a few narrow code pa
 - **Reminders can't double-send.** Each reminder is claimed with an atomic update before sending. If sending fails, the claim is released and the next run retries.
 - **Old passes stop working.** Each RSVP's pass token changes whenever it is cancelled, declined or re-requested.
 - **An invite works only for the person invited.** It skips host approval but never capacity, and the link is tied to the invited email or account, so forwarding it doesn't let someone else in.
+- **Reminders can't be lost or doubled.** The scheduler claims each reminder with a conditional database update before queueing it, so two scheduler processes can't both send. If sending fails for good, the claim is released and the next run retries. A bug that fails every time would therefore retry every 15 minutes until fixed.
+- **Trust score is a plain formula.** `50 + 30 × attendance rate + 2 per hosted event (max 10) − 5 per event the host cancelled after publishing (max 4)`, clamped to 0 to 100. Attendance counts only confirmed guests on completed events. Accounts with fewer than 3 past events show as "New".
 - **Logging out clears saved passes.** Tickets are cached for offline use at the venue. Logout clears that cache so the next person on a shared phone can't see them.
 
 ## Roadmap
@@ -141,7 +156,7 @@ Each phase is finished only when its tests pass and it has been checked by hand.
 3. ✅ **Listing-fee checkout:** sandbox UPI, signed webhooks, Razorpay adapter (not yet tested against live Razorpay)
 4. ✅ **RSVP engine:** capacity, approvals, waitlist, invitations, overbooking tests under concurrent requests
 5. ✅ **QR passes and scanner:** signed passes, host camera check-in, offline tickets (camera and offline caching not yet checked on a device)
-6. **Email and reminders:** Celery pipeline, scheduled reminders, trust score
+6. ✅ **Email and reminders:** Celery pipeline, scheduled reminders, trust score, production settings (worker and beat checked once against Redis on Windows)
 
 ## Contributing
 

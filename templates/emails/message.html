@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<body style="margin:0;padding:0;background:#FAF7F2;font-family:Atkinson Hyperlegible,Segoe UI,Arial,sans-serif;color:#1C1A17;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FAF7F2;">
+    <tr><td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border:1px solid #E8E1D6;border-radius:12px;">
+        <tr><td style="padding:24px;">
+          <p style="margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#5E7D6A;font-weight:700;">Partly</p>
+          <h1 style="margin:0 0 16px;font-size:22px;line-height:1.25;font-family:Bricolage Grotesque,Segoe UI,Arial,sans-serif;">{{ title }}</h1>
+          <p style="margin:0 0 12px;font-size:16px;line-height:1.5;">{{ greeting }}</p>
+          {% for line in lines %}{% if line %}<p style="margin:0 0 10px;font-size:16px;line-height:1.5;">{{ line }}</p>{% endif %}{% endfor %}
+          {% if button %}<p style="margin:20px 0 4px;"><a href="{{ button.url }}" style="display:inline-block;background:#C4704F;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;">{{ button.label }}</a></p>{% endif %}
+          {% if footer %}<p style="margin:20px 0 0;font-size:14px;line-height:1.5;color:#6B665E;">{{ footer }}</p>{% endif %}
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

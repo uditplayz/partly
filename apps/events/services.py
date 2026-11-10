@@ -52,3 +52,16 @@ def waive_and_publish(event):
     event.published_at = timezone.now()
     event.save(update_fields=["platform_fee_status", "status", "published_at", "updated_at"])
     return event
+
+
+def complete_finished_events(now=None):
+    """PUBLISHED events whose end time has passed become COMPLETED. Returns their ids."""
+    now = now or timezone.now()
+    ids = list(
+        Event.objects.filter(status=Event.Status.PUBLISHED, end_time__lt=now).values_list("pk", flat=True)
+    )
+    if ids:
+        Event.objects.filter(pk__in=ids, status=Event.Status.PUBLISHED).update(
+            status=Event.Status.COMPLETED, updated_at=now
+        )
+    return ids

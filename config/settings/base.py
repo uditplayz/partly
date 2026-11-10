@@ -29,12 +29,14 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "django.contrib.postgres",
+    "django_celery_beat",
     # local
     "apps.core",
     "apps.accounts",
     "apps.events",
     "apps.payments",
     "apps.rsvps",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -112,7 +114,7 @@ EMAIL_BACKEND = env(
 )
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Partly <hello@partly.local>")
 
-# --- Celery (wired up fully in Phase 6) -------------------------------------
+# --- Celery -----------------------------------------------------------------
 CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER")
@@ -121,6 +123,8 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # --- App --------------------------------------------------------------------
 SITE_NAME = "Partly"

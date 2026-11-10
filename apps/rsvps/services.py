@@ -4,7 +4,6 @@ Seat safety: each function that can change seats first locks the event row
 (SELECT ... FOR UPDATE), so seat decisions for one event run one at a time.
 Lock order is always event first, then RSVP rows.
 """
-from functools import partial
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
@@ -13,7 +12,8 @@ from django.utils import timezone
 
 from apps.events.models import Event
 
-from . import notifications
+from apps.notifications import dispatch, tasks
+
 from .models import RSVP, Invitation
 
 Status = RSVP.Status
@@ -36,7 +36,7 @@ def _confirm(rsvp):
     rsvp.status = Status.CONFIRMED
     rsvp.confirmed_at = timezone.now()
     rsvp.save()
-    transaction.on_commit(partial(notifications.rsvp_confirmed, rsvp.pk))
+    dispatch.enqueue(tasks.send_rsvp_confirmation_email, rsvp.pk)
 
 
 def _place(rsvp, event):
@@ -109,7 +109,7 @@ def request_rsvp(user, event, plus_ones=0, note="", invitation=None):
     if event.requires_host_approval and invitation is None:
         rsvp.status = Status.PENDING_APPROVAL
         rsvp.save()
-        transaction.on_commit(partial(notifications.host_new_request, rsvp.pk))
+        dispatch.enqueue(tasks.send_host_new_rsvp_notification, rsvp.pk)
     else:
         _place(rsvp, event)
     return rsvp
@@ -183,6 +183,7 @@ def host_cancel_event(event, host):
         rsvp.status = Status.CANCELLED
         rsvp._reset_lifecycle()
         rsvp.save()
+        dispatch.enqueue(tasks.send_event_cancelled_email, rsvp.pk)
         affected += 1
     return affected
 
@@ -211,7 +212,7 @@ def create_invitation(event, host, email):
     try:
         with transaction.atomic():
             invitation = Invitation.objects.create(event=event, invited_by=host, invitee_email=email, invitee_user=user)
-            transaction.on_commit(partial(notifications.invitation_created, invitation.pk))
+            dispatch.enqueue(tasks.send_event_invitation_email, invitation.pk)
     except IntegrityError:  # two requests raced; the unique constraints kept one
         return Invitation.objects.filter(match, event=event).get(), False
     return invitation, True
